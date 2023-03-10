@@ -1,5 +1,5 @@
 /**
- * Node-JS Boilerplate
+ * Vape Verification
  * @author Yousuf Kalim
  */
 import '@database';
