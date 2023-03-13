@@ -3,10 +3,13 @@
  * @author Yousuf Kalim
  */
 import { Router } from 'express';
-import { create, update, getAll, getById, deleteUser } from '@controllers/users.controller';
+import { createAdmin, update, getAll, getById, deleteUser } from '@controllers/users.controller';
 import { checkUserAuth } from '@middleware/auth.middleware';
-import { upload } from '@middleware/multer.middleware';
-import { validateUser, validateUserUpdate, isValidated } from '@middleware/validations.middleware';
+import {
+  validateAdmin,
+  validateAdminUpdate,
+  isValidated,
+} from '@middleware/validations.middleware';
 const router = Router();
 
 /**
@@ -19,14 +22,14 @@ const router = Router();
  */
 
 // Create - User Signup
-router.post('/', upload.single('image'), validateUser, isValidated, create);
+router.post('/admin', validateAdmin, isValidated, createAdmin);
 
 // Read
 router.get('/', checkUserAuth, getAll); // Get all users at once
 router.get('/:userId', checkUserAuth, getById); // Get one user by it's id
 
 // Update
-router.put('/:userId', checkUserAuth, validateUserUpdate, isValidated, update); // Update a specific user by it's id
+router.put('/admin', checkUserAuth, validateAdminUpdate, isValidated, update); // Update a specific user by it's id
 
 // Delete
 router.delete('/:userId', checkUserAuth, deleteUser); // delete a specific user by it's id

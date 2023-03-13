@@ -7,7 +7,7 @@ export default interface User {
   email: string;
   password?: string;
   role: 'admin' | 'brand';
-  preferences: {
+  preferences?: {
     logo?: string;
     color?: string;
   };

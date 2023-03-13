@@ -13,7 +13,7 @@ import { BCRYPT_SALT } from '@config';
  * @param {object} req
  * @param {object} res
  */
-export const create = async (req: Request, res: Response): Promise<Response> => {
+export const createAdmin = async (req: Request, res: Response): Promise<Response> => {
   const body: User = req.body;
 
   try {
@@ -26,14 +26,9 @@ export const create = async (req: Request, res: Response): Promise<Response> => 
       return res.status(409).json({ success: false, message: 'User already exists.' });
     }
 
-    // Getting url of the image
-    if (req.file) {
-      body.photo = req.file.path; // Creating a new property called photo in body object
-    }
-
     // Creating User
-    body.password = bcrypt.hashSync(password, BCRYPT_SALT); // Hashing the password with salt 8
-    const user = await Users.create(body); // Adding user in db
+    body.password = bcrypt.hashSync(password as string, BCRYPT_SALT); // Hashing the password with salt 8
+    const user = await Users.create({ ...body, role: 'admin' }); // Adding user in db
 
     // Done
     return res.json({ success: true, user }); // Success

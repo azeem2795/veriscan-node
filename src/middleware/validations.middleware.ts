@@ -13,28 +13,16 @@ Validations
 
 // You can create multiple validations strategies (Read express-validator documentation for more details)
 // User Signup Validation
-export const validateUser = [
+export const validateAdmin = [
   check('name', 'Name is required.').notEmpty().trim(),
   check('email', 'Email is required.').notEmpty().isEmail().trim(),
   check('password', 'Password is required.').notEmpty().trim().isLength({ min: 8 }),
-  check('number', 'Number is required.').notEmpty().isNumeric().trim(),
-  check('gender').trim(),
-  check('role').trim(),
-  check('address').trim(),
-  check('city').trim(),
-  check('country').trim(),
 ];
 
 // User Signup Validation
-export const validateUserUpdate = [
+export const validateAdminUpdate = [
   check('name', 'Name is required.').notEmpty().trim(),
   check('email', 'Email is required.').notEmpty().isEmail().trim(),
-  check('number', 'Number is required.').notEmpty().isNumeric().trim(),
-  check('gender').trim(),
-  check('role').trim(),
-  check('address').trim(),
-  check('city').trim(),
-  check('country').trim(),
 ];
 
 // Login validation
