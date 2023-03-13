@@ -16,7 +16,10 @@ const router = Router();
 
 /**
  * ////////////////////////// Routes /////////////////////////
+ * @method post validate a code
  * @method get get codes
+ * @method get get all codes for export
+ * @method put invalidate the codes
  */
 router.post('/validate', validateCode);
 

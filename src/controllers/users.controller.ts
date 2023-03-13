@@ -6,7 +6,7 @@ import { Request, Response } from 'express';
 import Users from '@models/users.model';
 import User from '@interfaces/users.interface';
 import bcrypt from 'bcryptjs';
-import { BCRYPT_SALT, JWT_SECRET , ORIGIN } from '@config';
+import { BCRYPT_SALT, JWT_SECRET, ORIGIN } from '@config';
 import IRequest from '@interfaces/request.interface';
 import { sendInvitationEmail } from '@utils/sendEmail';
 import jwt from 'jsonwebtoken';
@@ -52,13 +52,15 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
   const body: User = req.body;
 
   try {
-    const { email } = body; // Getting required fields from body
-    const existingUser = await Users.findOne({ email }); // Finding already existing user
+    const { name, email } = body; // Getting required fields from body
+    const existingUser = await Users.findOne({ $or: [{ email }, { name }] }); // Finding already existing user
 
     // Extra Validations
     if (existingUser) {
       // If we found existing user in db
-      return res.status(409).json({ success: false, message: 'User already exists.' });
+      return res
+        .status(409)
+        .json({ success: false, message: 'User already exists with same email or name' });
     }
 
     if (req.file?.path) {
@@ -124,6 +126,36 @@ export const getById = async (req: IRequest, res: Response): Promise<Response> =
 
     const user = await Users.findById(userId); // Finding user by id
     return res.json({ success: true, user }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Get brand by name
+ * @param {object} req
+ * @param {object} res
+ */
+export const getBrandByName = async (req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const { name } = req.params; // Getting user id from URL parameter
+
+    const brand = await Users.findOne({ name, role: 'brand' });
+
+    if (!brand) {
+      return res.status(404).json({ success: false, message: 'Brand not found' });
+    }
+
+    return res.json({
+      success: true,
+      brand: {
+        name: brand.name,
+        preferences: brand.preferences,
+      },
+    }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
