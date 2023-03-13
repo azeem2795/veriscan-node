@@ -1,5 +1,5 @@
 /**
- * User schema
+ * Request schema
  * @author Yousuf Kalim
  */
 import { model, Schema, Document } from 'mongoose';
@@ -20,10 +20,12 @@ const requestSchema = new Schema(
     brand: {
       type: Schema.Types.ObjectId,
       ref: 'User',
+      required: true,
     },
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected'],
+      required: true,
     },
   },
   {
