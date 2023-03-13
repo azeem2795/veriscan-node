@@ -21,6 +21,7 @@ const router = Router();
  * @method post create a request
  * @method get get all request
  * @method get get request by id
+ * @method patch approve a request
  * @method patch reject the request
  * @method delete delete a request
  */
