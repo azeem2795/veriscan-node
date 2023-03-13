@@ -98,3 +98,40 @@ export const invalidateCodes = async (req: IRequest, res: Response): Promise<Res
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+/**
+ * Validate a codes
+ * @param {object} req
+ * @param {object} res
+ */
+export const validateCode = async (req: IRequest, res: Response): Promise<Response> => {
+  const { codeId, brandId } = req.body;
+  try {
+    const code = await Codes.findOne({ code: codeId, brand: brandId });
+
+    if (!code || code.status === 'invalidated') {
+      return res.status(404).json({ success: false, message: 'Code is not valid' });
+    }
+
+    if (code.status === 'validated') {
+      code.scan_attempts = code.scan_attempts + 1;
+      await code.save();
+
+      return res.status(400).json({ success: false, message: 'Code has already been used' });
+    }
+
+    code.status = 'validated';
+    code.ip_address = req.ip;
+    code.user_agent = req.get('User-Agent');
+    code.validation_time = new Date();
+    code.scan_attempts = code.scan_attempts + 1;
+    await code.save();
+
+    return res.json({ success: true, message: 'Product is valid' });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
