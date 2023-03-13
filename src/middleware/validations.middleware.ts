@@ -23,14 +23,10 @@ export const validateBrand = [
   check('email', 'Email is required.').notEmpty().isEmail().trim(),
 ];
 
-// User Signup Validation
-export const validateAdminUpdate = [
-  check('name', 'Name is required.').notEmpty().trim(),
-  check('email', 'Email is required.').notEmpty().isEmail().trim(),
-];
-export const validateBrandUpdate = [
-  check('name', 'Name is required.').notEmpty().trim(),
-  check('email', 'Email is required.').notEmpty().isEmail().trim(),
+// Code request validation
+export const validateCodeRequest = [
+  check('name', 'Name is required').notEmpty().trim(),
+  check('number_of_codes', 'Number of codes are required').notEmpty().isNumeric(),
 ];
 
 // Login validation

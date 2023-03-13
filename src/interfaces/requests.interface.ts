@@ -4,7 +4,7 @@
  */
 import User from './users.interface';
 
-export default interface Request {
+export default interface CodeRequest {
   _id: string;
   name: string;
   number_of_codes: number;
