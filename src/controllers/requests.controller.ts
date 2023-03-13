@@ -25,3 +25,34 @@ export const create = async (req: IRequest, res: Response): Promise<Response> =>
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+/**
+ * delete request
+ * @param {object} req
+ * @param {object} res
+ */
+export const deleteRequest = async (req: IRequest, res: Response): Promise<Response> => {
+  const { id } = req.params;
+  try {
+    const request = await Requests.findById(id);
+
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Request not found' });
+    }
+
+    if (request.status !== 'pending') {
+      return res
+        .status(400)
+        .json({ success: false, message: 'You cannot delete processed request' });
+    }
+
+    await Requests.findByIdAndDelete(id);
+
+    return res.json({ success: true, message: 'Request has been deleted' });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
