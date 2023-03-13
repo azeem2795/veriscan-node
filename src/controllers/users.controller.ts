@@ -9,7 +9,7 @@ import bcrypt from 'bcryptjs';
 import { BCRYPT_SALT } from '@config';
 
 /**
- * Create User - Signup
+ * Create Admin - Signup
  * @param {object} req
  * @param {object} res
  */
@@ -45,9 +45,9 @@ export const createAdmin = async (req: Request, res: Response): Promise<Response
  * @param {object} _req
  * @param {object} res
  */
-export const getAll = async (_req: Request, res: Response): Promise<Response> => {
+export const getAllAdmins = async (_req: Request, res: Response): Promise<Response> => {
   try {
-    const users = await Users.find(); // Finding all the users from db
+    const users = await Users.find({ role: 'admin' }); // Finding all the users from db
     return res.json({ success: true, users }); // Success
   } catch (err) {
     // Error handling
@@ -62,10 +62,11 @@ export const getAll = async (_req: Request, res: Response): Promise<Response> =>
  * @param {object} req
  * @param {object} res
  */
-export const getById = async (req: Request, res: Response): Promise<Response> => {
+export const getAdminById = async (req: Request, res: Response): Promise<Response> => {
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
-    const user = await Users.findById(userId); // Finding user by id
+
+    const user = await Users.findOne({ _id: userId, role: 'admin' }); // Finding user by id
     return res.json({ success: true, user }); // Success
   } catch (err) {
     // Error handling
@@ -80,7 +81,7 @@ export const getById = async (req: Request, res: Response): Promise<Response> =>
  * @param {object} req
  * @param {object} res
  */
-export const update = async (req: Request, res: Response): Promise<Response> => {
+export const updateAdmin = async (req: Request, res: Response): Promise<Response> => {
   const body: User = req.body;
 
   try {
@@ -106,10 +107,10 @@ export const update = async (req: Request, res: Response): Promise<Response> => 
  * @param {object} req
  * @param {object} res
  */
-export const deleteUser = async (req: Request, res: Response): Promise<Response> => {
+export const deleteAdmin = async (req: Request, res: Response): Promise<Response> => {
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
-    const user = await Users.findByIdAndDelete(userId); // Deleting the user
+    const user = await Users.findOneAndDelete({ _id: userId, role: 'admin' }); // Deleting the user
     return res.json({ success: true, user }); // Success
   } catch (err) {
     // Error handling
