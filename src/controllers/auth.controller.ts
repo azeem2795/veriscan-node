@@ -32,7 +32,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     }
 
     // Comparing password
-    const isMatched = bcrypt.compareSync(password, user.password);
+    const isMatched = bcrypt.compareSync(password, user.password as string);
 
     if (!isMatched) {
       // If password not matched
@@ -40,7 +40,6 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     }
 
     // Creating payload with user object
-    // @ts-expect-error
     delete user.password; // Removing password from user object
     const payload = { user };
 
@@ -61,8 +60,8 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
  * @param {object} req
  * @param {object} res
  */
-export const changePassword = async (req: Request, res: Response): Promise<Response> => {
-  const { userId } = req.params;
+export const changePassword = async (req: IRequest, res: Response): Promise<Response> => {
+  const userId = req.user?._id;
   const body: ChangePassword = req.body;
 
   try {
@@ -81,7 +80,7 @@ export const changePassword = async (req: Request, res: Response): Promise<Respo
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    const isMatched = bcrypt.compareSync(oldPassword, user.password);
+    const isMatched = bcrypt.compareSync(oldPassword, user.password as string);
 
     if (!isMatched) {
       return res.status(400).json({ success: false, message: 'Invalid old Password' });

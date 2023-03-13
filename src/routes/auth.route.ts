@@ -23,7 +23,7 @@ const router = Router();
 // Read
 router.post('/login', validateLogin, isValidated, login); // Get all users at once
 router.get('/', checkUserAuth, confirmAuth); // Check user auth
-router.put('/password/:userId', checkUserAuth, changePasswordValidate, isValidated, changePassword); // Change password route
+router.put('/password/', checkUserAuth, changePasswordValidate, isValidated, changePassword); // Change password route
 router.put('/forgot/:email', forgot); // Forgot password
 
 // Export
