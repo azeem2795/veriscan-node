@@ -5,11 +5,11 @@
 export default interface User {
   name: string;
   email: string;
-  password: string;
+  password?: string;
   role: 'admin' | 'brand';
   preferences: {
-    logo: string;
-    color: string;
+    logo?: string;
+    color?: string;
   };
   active: boolean;
   createdAt: string;

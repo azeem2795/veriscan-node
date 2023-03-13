@@ -18,26 +18,22 @@ const userSchema = new Schema(
       unique: true,
       lowercase: true,
     },
-    password: {
-      type: String,
-      required: true,
-      minlength: 8,
-    },
+    password: String,
     role: {
       type: String,
-      enum: ['admin','brand'],
+      enum: ['admin', 'brand'],
       default: 'brand',
     },
     preferences: {
       logo: String,
-      color: String
+      color: String,
     },
     active: {
       type: Boolean,
       required: true,
       // TODO: Make this to false after development
-      default: true
-    }
+      default: true,
+    },
   },
   {
     timestamps: true,
