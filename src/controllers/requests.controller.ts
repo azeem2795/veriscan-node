@@ -6,6 +6,8 @@ import { Response } from 'express';
 import CodeRequest from '@interfaces/requests.interface';
 import Requests from '@models/requests.model';
 import IRequest from '@interfaces/request.interface';
+import short from 'short-uuid';
+import Codes from '@models/codes.model';
 
 /**
  * create request
@@ -71,6 +73,51 @@ export const getRequestById = async (req: IRequest, res: Response): Promise<Resp
     }
 
     return res.json({ success: true, request });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Approve request
+ * @param {object} req
+ * @param {object} res
+ */
+export const approveRequest = async (req: IRequest, res: Response): Promise<Response> => {
+  const { id } = req.params;
+  try {
+    const request = await Requests.findById(id);
+
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Request not found' });
+    }
+
+    if (request.status !== 'pending') {
+      return res
+        .status(400)
+        .json({ success: false, message: 'You cannot approve a processed request' });
+    }
+
+    const codes = [];
+
+    for (let i = 0; i < request.number_of_codes; i++) {
+      codes.push({
+        code: short.generate(),
+        brand: request.brand,
+      });
+    }
+
+    Codes.insertMany(codes)
+      .then(() => console.log(`${codes.length} codes has been created`))
+      .catch(console.log);
+
+    request.status = 'approved';
+    await request.save();
+
+    return res.json({ success: true, message: 'Request approved successfully' });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

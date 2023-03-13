@@ -11,10 +11,12 @@ const codeSchema = new Schema(
     code: {
       type: String,
       required: true,
+      unique: true,
     },
     status: {
       type: String,
       enum: ['pending', 'validated', 'invalidated'],
+      default: 'pending',
       required: true,
     },
     ip_address: String,

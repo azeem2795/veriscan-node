@@ -10,6 +10,7 @@ import {
   rejectRequest,
   getAllRequests,
   getRequestById,
+  approveRequest,
 } from '@controllers/requests.controller';
 import { validateCodeRequest, isValidated } from '@middleware/validations.middleware';
 
@@ -28,6 +29,7 @@ router.post('/', checkUserAuth, validateCodeRequest, isValidated, create);
 router.get('/', checkUserAuth, getAllRequests);
 router.get('/:id', checkUserAuth, getRequestById);
 
+router.patch('/approve/:id', checkAdminAuth, approveRequest);
 router.patch('/reject/:id', checkAdminAuth, rejectRequest);
 
 router.delete('/:id', checkUserAuth, deleteRequest);
