@@ -4,7 +4,7 @@
  */
 import { Router } from 'express';
 import { checkUserAuth } from '@middleware/auth.middleware';
-import { getCodes } from '@controllers/codes.controller';
+import { exportCodes, getCodes } from '@controllers/codes.controller';
 
 const router = Router();
 
@@ -13,6 +13,7 @@ const router = Router();
  * @method get get codes
  */
 router.get('/', checkUserAuth, getCodes);
+router.get('/export', checkUserAuth, exportCodes);
 
 // Export
 export default router;

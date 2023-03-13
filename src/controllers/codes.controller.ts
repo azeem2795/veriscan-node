@@ -45,3 +45,28 @@ export const getCodes = async (req: IRequest, res: Response): Promise<Response> 
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+/**
+ * Export request
+ * @param {object} req
+ * @param {object} res
+ */
+export const exportCodes = async (req: IRequest, res: Response): Promise<Response> => {
+  const { brand, status } = req.query;
+  try {
+    if (req.user?.role === 'admin') {
+      const codes = await Codes.find({ brand, status });
+
+      return res.json({ success: true, codes });
+    } else {
+      const codes = await Codes.find({ brand: req.user?._id, status });
+
+      return res.json({ success: true, codes });
+    }
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
