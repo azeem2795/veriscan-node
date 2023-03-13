@@ -3,7 +3,14 @@
  * @author Yousuf Kalim
  */
 import { Router } from 'express';
-import { login, confirmAuth, changePassword, forgot } from '@controllers/auth.controller';
+import {
+  login,
+  confirmAuth,
+  changePassword,
+  resetPassword,
+  forgot,
+  verifyToken,
+} from '@controllers/auth.controller';
 import { checkUserAuth } from '@middleware/auth.middleware';
 import {
   validateLogin,
@@ -23,6 +30,8 @@ const router = Router();
 // Read
 router.post('/login', validateLogin, isValidated, login); // Get all users at once
 router.get('/', checkUserAuth, confirmAuth); // Check user auth
+router.get('/verify-token/:token', verifyToken);
+router.put('/reset-password/:token', resetPassword);
 router.put('/password/', checkUserAuth, changePasswordValidate, isValidated, changePassword); // Change password route
 router.put('/forgot/:email', forgot); // Forgot password
 

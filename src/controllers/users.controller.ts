@@ -6,8 +6,10 @@ import { Request, Response } from 'express';
 import Users from '@models/users.model';
 import User from '@interfaces/users.interface';
 import bcrypt from 'bcryptjs';
-import { BCRYPT_SALT } from '@config';
+import { BCRYPT_SALT, JWT_SECRET , ORIGIN } from '@config';
 import IRequest from '@interfaces/request.interface';
+import { sendInvitationEmail } from '@utils/sendEmail';
+import jwt from 'jsonwebtoken';
 
 /**
  * Create Admin - Signup
@@ -70,6 +72,11 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
     }
 
     const user = await Users.create(body); // Adding user in db
+
+    // Generating token
+    const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: '15m' });
+
+    await sendInvitationEmail(email, `${ORIGIN}/verify/${token}`);
 
     // Done
     return res.json({ success: true, user }); // Success

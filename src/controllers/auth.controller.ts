@@ -7,9 +7,9 @@ import IRequest from '@interfaces/request.interface';
 import Auth, { ChangePassword } from '@interfaces/auth.interface';
 import Users from '@models/users.model';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
-import { sendEmail } from '@utils/sendEmail';
-import { JWT_SECRET, BCRYPT_SALT } from '@config';
+import jwt, { JwtPayload } from 'jsonwebtoken';
+import { sendForgotEmail } from '@utils/sendEmail';
+import { BCRYPT_SALT, JWT_SECRET, ORIGIN } from '@config';
 
 /**
  * Login
@@ -31,8 +31,13 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
+    if (!user.password) {
+      // If user is not activated
+      return res.status(404).json({ success: false, message: 'Your account is not activated' });
+    }
+
     // Comparing password
-    const isMatched = bcrypt.compareSync(password, user.password as string);
+    const isMatched = bcrypt.compareSync(password, user.password);
 
     if (!isMatched) {
       // If password not matched
@@ -114,18 +119,71 @@ export const forgot = async (req: Request, res: Response): Promise<Response> => 
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    // Generating random password
-    const randomPassword = Math.random().toString(36).slice(-8);
+    // Generating token
+    const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: '15m' });
 
-    // Sending email to user
-    await sendEmail(email, randomPassword);
-
-    // If email is sent then we have to update the password in db
-    user.password = await bcrypt.hash(randomPassword, BCRYPT_SALT);
-    await user.save();
+    await sendForgotEmail(email, `${ORIGIN}/verify/${token}`);
 
     // Done
     return res.json({ success: true, message: 'Email sent successfully' });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Verify token
+ * @param {object} req
+ * @param {object} res
+ */
+export const verifyToken = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { token } = req.params;
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+
+    const user = await Users.findById(decoded.user._id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: 'Token verified successfully',
+      userId: user._id,
+    });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Reset password
+ * @param {object} req
+ * @param {object} res
+ */
+export const resetPassword = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { token } = req.params;
+
+    const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
+
+    const user = await Users.findById(decoded.user._id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    user.password = bcrypt.hashSync(req.body.password, 10);
+    await user.save();
+
+    return res.status(200).json({ success: true, message: 'Password updated successfully' });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

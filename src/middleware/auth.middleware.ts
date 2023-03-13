@@ -27,7 +27,6 @@ export const checkAdminAuth = (
   try {
     // Decrypting token
     const token = header.split(' ')[1];
-    console.log(token);
     const { user } = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
     if (!user || user.role !== 'admin') {
