@@ -18,9 +18,17 @@ export const validateAdmin = [
   check('email', 'Email is required.').notEmpty().isEmail().trim(),
   check('password', 'Password is required.').notEmpty().trim().isLength({ min: 8 }),
 ];
+export const validateBrand = [
+  check('name', 'Name is required.').notEmpty().trim(),
+  check('email', 'Email is required.').notEmpty().isEmail().trim(),
+];
 
 // User Signup Validation
 export const validateAdminUpdate = [
+  check('name', 'Name is required.').notEmpty().trim(),
+  check('email', 'Email is required.').notEmpty().isEmail().trim(),
+];
+export const validateBrandUpdate = [
   check('name', 'Name is required.').notEmpty().trim(),
   check('email', 'Email is required.').notEmpty().isEmail().trim(),
 ];

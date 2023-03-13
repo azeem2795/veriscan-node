@@ -7,6 +7,7 @@ import Users from '@models/users.model';
 import User from '@interfaces/users.interface';
 import bcrypt from 'bcryptjs';
 import { BCRYPT_SALT } from '@config';
+import IRequest from '@interfaces/request.interface';
 
 /**
  * Create Admin - Signup
@@ -41,13 +42,55 @@ export const createAdmin = async (req: Request, res: Response): Promise<Response
 };
 
 /**
- * Get all users
- * @param {object} _req
+ * Create Brand - Signup
+ * @param {object} req
  * @param {object} res
  */
-export const getAllAdmins = async (_req: Request, res: Response): Promise<Response> => {
+export const createBrand = async (req: Request, res: Response): Promise<Response> => {
+  const body: User = req.body;
+
   try {
-    const users = await Users.find({ role: 'admin' }); // Finding all the users from db
+    const { email } = body; // Getting required fields from body
+    const existingUser = await Users.findOne({ email }); // Finding already existing user
+
+    // Extra Validations
+    if (existingUser) {
+      // If we found existing user in db
+      return res.status(409).json({ success: false, message: 'User already exists.' });
+    }
+
+    if (req.file?.path) {
+      if (body.preferences) {
+        body.preferences.logo = req.file.path;
+      } else {
+        body.preferences = {
+          logo: req.file.path,
+        };
+      }
+    }
+
+    const user = await Users.create(body); // Adding user in db
+
+    // Done
+    return res.json({ success: true, user }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Get all users
+ * @param {object} req
+ * @param {object} res
+ */
+export const getAll = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const role = req.query.role ?? 'brand';
+
+    const users = await Users.find({ role }); // Finding all the users from db
     return res.json({ success: true, users }); // Success
   } catch (err) {
     // Error handling
@@ -62,11 +105,17 @@ export const getAllAdmins = async (_req: Request, res: Response): Promise<Respon
  * @param {object} req
  * @param {object} res
  */
-export const getAdminById = async (req: Request, res: Response): Promise<Response> => {
+export const getById = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
 
-    const user = await Users.findOne({ _id: userId, role: 'admin' }); // Finding user by id
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
+    const user = await Users.findById(userId); // Finding user by id
     return res.json({ success: true, user }); // Success
   } catch (err) {
     // Error handling
@@ -77,19 +126,61 @@ export const getAdminById = async (req: Request, res: Response): Promise<Respons
 };
 
 /**
- * Update user
+ * Update admin
  * @param {object} req
  * @param {object} res
  */
-export const updateAdmin = async (req: Request, res: Response): Promise<Response> => {
+export const updateAdmin = async (req: IRequest, res: Response): Promise<Response> => {
+  const body: User = req.body;
+
+  try {
+    const userId = req.user?._id; // Getting user id from URL parameter
+
+    // If user want to update it's password
+    if (body.password) {
+      body.password = bcrypt.hashSync(body.password, BCRYPT_SALT);
+    }
+
+    const user = await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
+    return res.json({ success: true, user }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Update brand
+ * @param {object} req
+ * @param {object} res
+ */
+export const updateBrand = async (req: IRequest, res: Response): Promise<Response> => {
   const body: User = req.body;
 
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
 
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
     // If user want to update it's password
     if (body.password) {
       body.password = bcrypt.hashSync(body.password, BCRYPT_SALT);
+    }
+
+    if (req.file?.path) {
+      if (body.preferences) {
+        body.preferences.logo = req.file.path;
+      } else {
+        body.preferences = {
+          logo: req.file.path,
+        };
+      }
     }
 
     const user = await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user

@@ -9,10 +9,7 @@ import { MONGODB_URI } from '@config';
 set('debug', true);
 
 // Connection
-connect(MONGODB_URI, {
-  // Some common settings (You don't need to understand these)
-  ignoreUndefined: true,
-})
+connect(MONGODB_URI)
   // eslint-disable-next-line no-console
   .then(() => console.log('We are connected with database :)')) // Success
   .catch((err) => {

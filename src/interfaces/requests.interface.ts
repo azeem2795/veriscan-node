@@ -5,6 +5,7 @@
 import User from './users.interface';
 
 export default interface Request {
+  _id: string;
   name: string;
   number_of_codes: number;
   text?: string;

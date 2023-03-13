@@ -5,6 +5,7 @@
 import User from './users.interface';
 
 export default interface Code {
+  _id: string;
   code: string;
   status: 'pending' | 'validated' | 'invalidated';
   ip_address?: string;
