@@ -23,23 +23,21 @@ const userSchema = new Schema(
       required: true,
       minlength: 8,
     },
-    number: {
-      type: String,
-      required: true,
-    },
-    gender: {
-      type: String,
-      enum: ['male', 'female', 'other'],
-    },
     role: {
       type: String,
-      enum: ['user'],
-      default: 'user',
+      enum: ['admin','brand'],
+      default: 'brand',
     },
-    address: String,
-    city: String,
-    country: String,
-    photo: String,
+    preferences: {
+      logo: String,
+      color: String
+    },
+    active: {
+      type: Boolean,
+      required: true,
+      // TODO: Make this to false after development
+      default: true
+    }
   },
   {
     timestamps: true,
