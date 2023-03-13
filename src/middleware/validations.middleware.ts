@@ -29,6 +29,11 @@ export const validateCodeRequest = [
   check('number_of_codes', 'Number of codes are required').notEmpty().isNumeric(),
 ];
 
+// Code invalidate validation
+export const validateCodesInvalidate = [
+  check('codes', 'Array of code id is required').notEmpty().isArray(),
+];
+
 // Login validation
 export const validateLogin = [
   check('email', 'Email is required').notEmpty().isEmail().trim().toLowerCase(),

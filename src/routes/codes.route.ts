@@ -4,7 +4,8 @@
  */
 import { Router } from 'express';
 import { checkUserAuth } from '@middleware/auth.middleware';
-import { exportCodes, getCodes } from '@controllers/codes.controller';
+import { exportCodes, getCodes, invalidateCodes } from '@controllers/codes.controller';
+import { isValidated, validateCodesInvalidate } from '@middleware/validations.middleware';
 
 const router = Router();
 
@@ -14,6 +15,8 @@ const router = Router();
  */
 router.get('/', checkUserAuth, getCodes);
 router.get('/export', checkUserAuth, exportCodes);
+
+router.put('/invalidate', validateCodesInvalidate, isValidated, invalidateCodes);
 
 // Export
 export default router;

@@ -47,7 +47,7 @@ export const getCodes = async (req: IRequest, res: Response): Promise<Response> 
 };
 
 /**
- * Export request
+ * Export codes
  * @param {object} req
  * @param {object} res
  */
@@ -62,6 +62,34 @@ export const exportCodes = async (req: IRequest, res: Response): Promise<Respons
       const codes = await Codes.find({ brand: req.user?._id, status });
 
       return res.json({ success: true, codes });
+    }
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Invalidate codes
+ * @param {object} req
+ * @param {object} res
+ */
+export const invalidateCodes = async (req: IRequest, res: Response): Promise<Response> => {
+  const { codes = [] } = req.body;
+  try {
+    if (req.user?.role === 'admin') {
+      await Codes.updateMany({ _id: { $in: codes } }, { status: 'invalidated' });
+
+      return res.json({ success: true, message: 'Codes invalidated successfully' });
+    } else {
+      await Codes.updateMany(
+        { _id: { $in: codes }, brand: req.user?._id },
+        { status: 'invalidated' },
+      );
+
+      return res.json({ success: true, message: 'Codes invalidated successfully' });
     }
   } catch (err) {
     // Error handling
