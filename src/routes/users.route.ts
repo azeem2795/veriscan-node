@@ -20,28 +20,31 @@ const router = Router();
 
 /**
  * ////////////////////////// Routes /////////////////////////
- * @method post user signup
+ * @method post admin signup
+ * @method post add a brand
  * @method get get all users
+ * @method get get brand by brand name
  * @method get get user by id
- * @method put update user
- * @method delete delete user
+ * @method put update admin
+ * @method put update brand
+ * @method delete an admin
  */
 
 // Create - User Signup
-router.post('/admin', validateAdmin, isValidated, createAdmin);
-router.post('/brand', upload.single('logo'), validateBrand, isValidated, createBrand);
+router.post('/admin', validateAdmin, isValidated, createAdmin); // Register an admin
+router.post('/brand', upload.single('logo'), validateBrand, isValidated, createBrand); // Add a brand
 
 // Read
 router.get('/', checkAdminAuth, getAll); // Get all users at once
-router.get('/brand/:name', getBrandByName);
-router.get('/:userId', checkUserAuth, getById); // Get one user by it's id
+router.get('/brand/:name', getBrandByName); // Get brand by name
+router.get('/:userId', checkUserAuth, getById); // Get one user by id
 
 // Update
-router.put('/admin', checkAdminAuth, updateAdmin); // Update a specific admin by it's id
-router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by it's id
+router.put('/admin', checkAdminAuth, updateAdmin); // Update an admin
+router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by id
 
 // Delete
-router.delete('/admin/:userId', checkAdminAuth, deleteAdmin); // delete a specific user by it's id
+router.delete('/admin/:userId', checkAdminAuth, deleteAdmin); // delete a specific admin by id
 
 // Export
 export default router;

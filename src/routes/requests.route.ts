@@ -25,15 +25,15 @@ const router = Router();
  * @method patch reject the request
  * @method delete delete a request
  */
-router.post('/', checkUserAuth, validateCodeRequest, isValidated, create);
+router.post('/', checkUserAuth, validateCodeRequest, isValidated, create); // Create a request
 
-router.get('/', checkUserAuth, getAllRequests);
-router.get('/:id', checkUserAuth, getRequestById);
+router.get('/', checkUserAuth, getAllRequests); // Get all requests
+router.get('/:id', checkUserAuth, getRequestById); // Get request by id
 
-router.patch('/approve/:id', checkAdminAuth, approveRequest);
-router.patch('/reject/:id', checkAdminAuth, rejectRequest);
+router.patch('/approve/:id', checkAdminAuth, approveRequest); // Approve a request and create codes
+router.patch('/reject/:id', checkAdminAuth, rejectRequest); // Reject a request
 
-router.delete('/:id', checkUserAuth, deleteRequest);
+router.delete('/:id', checkUserAuth, deleteRequest); // Delete a request
 
 // Export
 export default router;

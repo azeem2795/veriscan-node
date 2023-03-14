@@ -23,15 +23,19 @@ const router = Router();
  * ////////////////////////// Routes /////////////////////////
  * @method post user login
  * @method get check auth
+ * @method get verify token
+ * @method put reset password
  * @method put change password
- * @method post forgot email
+ * @method post forgot password
  */
 
 // Read
 router.post('/login', validateLogin, isValidated, login); // Get all users at once
+
 router.get('/', checkUserAuth, confirmAuth); // Check user auth
-router.get('/verify-token/:token', verifyToken);
-router.put('/reset-password/:token', resetPassword);
+router.get('/verify-token/:token', verifyToken); // Verify user token
+
+router.put('/reset-password/:token', resetPassword); // Reset password
 router.put('/password/', checkUserAuth, changePasswordValidate, isValidated, changePassword); // Change password route
 router.put('/forgot/:email', forgot); // Forgot password
 
