@@ -51,6 +51,10 @@ export const createAdmin = async (req: Request, res: Response): Promise<Response
 export const createBrand = async (req: Request, res: Response): Promise<Response> => {
   const body: User = req.body;
 
+  if (body.preferences) {
+    body.preferences = JSON.parse(body.preferences as string);
+  }
+
   try {
     const { name, email } = body; // Getting required fields from body
     const existingUser = await Users.findOne({ $or: [{ email }, { name }] }); // Finding already existing user
@@ -198,6 +202,10 @@ export const updateAdmin = async (req: IRequest, res: Response): Promise<Respons
 export const updateBrand = async (req: IRequest, res: Response): Promise<Response> => {
   const body: User = req.body;
 
+  if (body.preferences) {
+    body.preferences = JSON.parse(body.preferences as string);
+  }
+
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
 
@@ -212,15 +220,22 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
       body.password = bcrypt.hashSync(body.password, BCRYPT_SALT);
     }
 
+    console.log('Req. file ', req.file);
     if (req.file?.path) {
       if (body.preferences) {
+        console.log('Enter ........ file ', req.file);
+
         body.preferences.logo = req.file.path;
       } else {
+        console.log('Enter ........ ELSE ', req.file);
+
         body.preferences = {
           logo: req.file.path,
         };
       }
     }
+
+    console.log('Req body  ==> ', body);
 
     const user = await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
     return res.json({ success: true, user }); // Success
