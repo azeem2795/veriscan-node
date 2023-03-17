@@ -31,7 +31,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    if (!user.password) {
+    if (!user.password || !user.active) {
       // If user is not activated
       return res.status(404).json({ success: false, message: 'Your account is not activated' });
     }
@@ -181,6 +181,7 @@ export const resetPassword = async (req: Request, res: Response): Promise<Respon
     }
 
     user.password = bcrypt.hashSync(req.body.password, 10);
+    user.active = true;
     await user.save();
 
     return res.status(200).json({ success: true, message: 'Password updated successfully' });

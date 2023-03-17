@@ -352,15 +352,63 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
 };
 
 /**
+ * Change status of a user
+ * @param {object} req
+ * @param {object} res
+ */
+export const changeStatus = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { id } = req.params; // Getting brand id from params
+
+    let user = await Users.findById(id);
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Set active property to false
+    user = await Users.findByIdAndUpdate(id, { active: !user.active }, { new: true });
+
+    // Done
+    return res.json({ success: true, message: 'Brand deactivated successfully', user });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
  * Delete user
  * @param {object} req
  * @param {object} res
  */
 export const deleteAdmin = async (req: Request, res: Response): Promise<Response> => {
+  const { userId } = req.params; // Getting userId from params
   try {
-    const userId = req.params.userId; // Getting user id from URL parameter
-    const user = await Users.findOneAndDelete({ _id: userId, role: 'admin' }); // Deleting the user
-    return res.json({ success: true, user }); // Success
+    let user = await Users.findById(userId); // Find user to check if exists
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    // Role base delete
+    if (user.role === 'admin') {
+      // If role is admin then we don't need no delete any other data
+      user = await Users.findByIdAndDelete({ _id: userId, role: 'admin' });
+
+      // Done
+      return res.json({ success: true, user });
+    } else {
+      // If role is brand then we need to delete requests and codes linked with that brand
+      user = await Users.findByIdAndDelete({ _id: userId, role: 'brand' });
+      await Requests.deleteMany({ brand: userId });
+      await Codes.deleteMany({ brand: userId });
+
+      //  Done
+      return res.json({ success: true, user });
+    }
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

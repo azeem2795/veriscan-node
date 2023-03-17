@@ -13,6 +13,7 @@ import {
   updateBrand,
   getBrandByName,
   getStats,
+  changeStatus,
 } from '@controllers/users.controller';
 import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
 import { upload } from '@middleware/multer.middleware';
@@ -44,6 +45,8 @@ router.get('/:userId', checkUserAuth, getById); // Get one user by id
 // Update
 router.put('/admin', checkAdminAuth, updateAdmin); // Update an admin
 router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by id
+
+router.patch('/change-status/:id', checkAdminAuth, changeStatus); // Deactivate a user
 
 // Delete
 router.delete('/admin/:userId', checkAdminAuth, deleteAdmin); // delete a specific admin by id
