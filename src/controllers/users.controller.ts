@@ -150,15 +150,21 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
     const { _id, role } = req.user as User;
 
     if (role === 'admin') {
-      const brandCount = await Users.find({ role: 'brand' }).countDocuments();
-      const requestCount = await Requests.find().countDocuments();
-      const codesCount = await Codes.find().countDocuments();
-      const validatedCodesCount = await Codes.find({ status: 'validated' }).countDocuments();
-
-      const pendingCodeRequests = await Requests.find({ status: 'pending' })
-        .sort({ createdAt: -1 })
-        .limit(7);
-      const brands = await Users.find({ role: 'brand' });
+      const [
+        brandCount,
+        requestCount,
+        codesCount,
+        validatedCodesCount,
+        brands,
+        pendingCodeRequests,
+      ] = await Promise.all([
+        Users.find({ role: 'brand' }).countDocuments(),
+        Requests.find().countDocuments(),
+        Codes.find().countDocuments(),
+        Codes.find({ status: 'validated' }).countDocuments(),
+        Users.find({ role: 'brand' }).select({ createdAt: 1 }),
+        Requests.find({ status: 'pending' }).sort({ createdAt: -1 }).limit(7),
+      ]);
 
       const now = new Date();
       const sixMonthsAgo = new Date();
@@ -190,24 +196,29 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         },
       });
     } else if (role === 'brand') {
-      const requestCount = await Requests.find({ brand: _id }).countDocuments();
-      const validatedCodesCount = await Codes.find({
-        brand: _id,
-        status: 'validated',
-      }).countDocuments();
-      const invalidatedCodesCount = await Codes.find({
-        brand: _id,
-        status: 'invalidated',
-      }).countDocuments();
-      const allCodesCount = await Codes.find({
-        brand: _id,
-      }).countDocuments();
-
-      const pendingCodeRequests = await Requests.find({ brand: _id, status: 'pending' })
-        .sort({ createdAt: -1 })
-        .limit(7);
-
-      const validatedCodes = await Codes.find({ brand: _id, status: 'validated' });
+      const [
+        requestCount,
+        validatedCodesCount,
+        invalidatedCodesCount,
+        allCodesCount,
+        pendingCodeRequests,
+        validatedCodes,
+      ] = await Promise.all([
+        Requests.find({ brand: _id }).countDocuments(),
+        Codes.find({
+          brand: _id,
+          status: 'validated',
+        }).countDocuments(),
+        Codes.find({
+          brand: _id,
+          status: 'invalidated',
+        }).countDocuments(),
+        Codes.find({
+          brand: _id,
+        }).countDocuments(),
+        Requests.find({ brand: _id, status: 'pending' }).sort({ createdAt: -1 }).limit(7),
+        Codes.find({ brand: _id, status: 'validated' }),
+      ]);
 
       const now = new Date();
       const sixMonthsAgo = new Date();
