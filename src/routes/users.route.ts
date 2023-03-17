@@ -12,6 +12,7 @@ import {
   deleteAdmin,
   updateBrand,
   getBrandByName,
+  getStats,
 } from '@controllers/users.controller';
 import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
 import { upload } from '@middleware/multer.middleware';
@@ -36,6 +37,7 @@ router.post('/brand', upload.single('logo'), validateBrand, isValidated, createB
 
 // Read
 router.get('/', checkAdminAuth, getAll); // Get all users at once
+router.get('/stats', checkUserAuth, getStats);
 router.get('/brand/:name', getBrandByName); // Get brand by name
 router.get('/:userId', checkUserAuth, getById); // Get one user by id
 

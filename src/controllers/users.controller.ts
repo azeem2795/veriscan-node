@@ -4,6 +4,8 @@
  */
 import { Request, Response } from 'express';
 import Users from '@models/users.model';
+import Requests from '@models/requests.model';
+import Codes from '@models/codes.model';
 import User from '@interfaces/users.interface';
 import bcrypt from 'bcryptjs';
 import { BCRYPT_SALT, JWT_SECRET, ORIGIN } from '@config';
@@ -130,6 +132,115 @@ export const getById = async (req: IRequest, res: Response): Promise<Response> =
 
     const user = await Users.findById(userId); // Finding user by id
     return res.json({ success: true, user }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Get stats
+ * @param {object} req
+ * @param {object} res
+ */
+export const getStats = async (req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const { _id, role } = req.user as User;
+
+    if (role === 'admin') {
+      const brandCount = await Users.find({ role: 'brand' }).countDocuments();
+      const requestCount = await Requests.find().countDocuments();
+      const codesCount = await Codes.find().countDocuments();
+      const validatedCodesCount = await Codes.find({ status: 'validated' }).countDocuments();
+
+      const pendingCodeRequests = await Requests.find({ status: 'pending' })
+        .sort({ createdAt: -1 })
+        .limit(7);
+      const brands = await Users.find({ role: 'brand' });
+
+      const now = new Date();
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(now.getMonth() - 6);
+
+      const filteredData = brands.filter((item) => {
+        const createdAt = new Date(item.createdAt);
+        return createdAt > sixMonthsAgo && createdAt <= now;
+      });
+
+      const stats: Record<string, number> = filteredData.reduce((result, item) => {
+        const createdAt = new Date(item.createdAt);
+        const month = createdAt.toLocaleString('default', { month: 'short' });
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        result[month] = (result[month] || 0) + 1;
+        return result;
+      }, {});
+
+      return res.json({
+        success: true,
+        stats: {
+          brandCount,
+          requestCount,
+          codesCount,
+          validatedCodesCount,
+          stats,
+          pendingCodeRequests,
+        },
+      });
+    } else if (role === 'brand') {
+      const requestCount = await Requests.find({ brand: _id }).countDocuments();
+      const validatedCodesCount = await Codes.find({
+        brand: _id,
+        status: 'validated',
+      }).countDocuments();
+      const invalidatedCodesCount = await Codes.find({
+        brand: _id,
+        status: 'invalidated',
+      }).countDocuments();
+      const allCodesCount = await Codes.find({
+        brand: _id,
+      }).countDocuments();
+
+      const pendingCodeRequests = await Requests.find({ brand: _id, status: 'pending' })
+        .sort({ createdAt: -1 })
+        .limit(7);
+
+      const validatedCodes = await Codes.find({ brand: _id, status: 'validated' });
+
+      const now = new Date();
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(now.getMonth() - 6);
+
+      const filteredData = validatedCodes.filter((item) => {
+        const createdAt = new Date(item.validation_time as string);
+        return createdAt > sixMonthsAgo && createdAt <= now;
+      });
+
+      const stats: Record<string, number> = filteredData.reduce((result, item) => {
+        const createdAt = new Date(item.validation_time as string);
+        const month = createdAt.toLocaleString('default', { month: 'short' });
+        // @ts-expect-error
+        // eslint-disable-next-line @typescript-eslint/restrict-plus-operands
+        result[month] = (result[month] || 0) + 1;
+        return result;
+      }, {});
+
+      return res.json({
+        success: true,
+        stats: {
+          requestCount,
+          validatedCodesCount,
+          invalidatedCodesCount,
+          allCodesCount,
+          stats,
+          pendingCodeRequests,
+        },
+      });
+    } else {
+      return res.status(403).json({ success: false, message: 'You are not authorized' });
+    }
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
