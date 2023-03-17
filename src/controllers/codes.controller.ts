@@ -108,7 +108,7 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
   const { codeId, brandId } = req.body;
   try {
     const code = await Codes.findOne({ code: codeId, brand: brandId });
-    console.log('CODEE ');
+
     if (!code || code.status === 'invalidated') {
       return res.status(404).json({ success: false, message: 'Code is not valid' });
     }

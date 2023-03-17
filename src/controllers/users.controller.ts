@@ -220,22 +220,15 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
       body.password = bcrypt.hashSync(body.password, BCRYPT_SALT);
     }
 
-    console.log('Req. file ', req.file);
     if (req.file?.path) {
       if (body.preferences) {
-        console.log('Enter ........ file ', req.file);
-
         body.preferences.logo = req.file.path;
       } else {
-        console.log('Enter ........ ELSE ', req.file);
-
         body.preferences = {
           logo: req.file.path,
         };
       }
     }
-
-    console.log('Req body  ==> ', body);
 
     const user = await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
     return res.json({ success: true, user }); // Success
