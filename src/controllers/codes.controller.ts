@@ -36,7 +36,7 @@ export const getCodes = async (req: IRequest, res: Response): Promise<Response> 
       const codesLength = await Codes.countDocuments({ brand: req.user?._id, status });
       const totalPages = Math.ceil(codesLength / limit);
 
-      return res.json({ success: true, page, totalPages, codes });
+      return res.json({ success: true, page, totalPages, codes, total: codesLength });
     }
   } catch (err) {
     // Error handling
