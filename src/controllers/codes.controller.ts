@@ -105,19 +105,23 @@ export const invalidateCodes = async (req: IRequest, res: Response): Promise<Res
  * @param {object} res
  */
 export const validateCode = async (req: IRequest, res: Response): Promise<Response> => {
-  const { codeId, brandId } = req.body;
+  const { codeId } = req.body;
   try {
-    const code = await Codes.findOne({ code: codeId, brand: brandId });
+    const code = await Codes.findOne({ code: codeId });
 
     if (!code || code.status === 'invalidated') {
-      return res.status(404).json({ success: false, message: 'Code is not valid' });
+      return res
+        .status(404)
+        .json({ success: false, status: 'invalid', message: 'This code is invalid.' });
     }
 
     if (code.status === 'validated') {
       code.scan_attempts = code.scan_attempts + 1;
       await code.save();
 
-      return res.status(400).json({ success: false, message: 'Code has already been used' });
+      return res
+        .status(400)
+        .json({ success: false, status: 'used', message: 'This code has already been used.' });
     }
 
     code.status = 'validated';
@@ -127,7 +131,7 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     code.scan_attempts = code.scan_attempts + 1;
     await code.save();
 
-    return res.json({ success: true, message: 'Product is valid' });
+    return res.json({ success: true, status: 'valid', message: 'This product is valid.' });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
