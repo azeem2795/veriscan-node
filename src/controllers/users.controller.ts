@@ -279,6 +279,7 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       success: true,
       brand: {
         name: brand.name,
+        id: brand._id,
         preferences: brand.preferences,
       },
     }); // Success
