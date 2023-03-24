@@ -105,9 +105,9 @@ export const invalidateCodes = async (req: IRequest, res: Response): Promise<Res
  * @param {object} res
  */
 export const validateCode = async (req: IRequest, res: Response): Promise<Response> => {
-  const { codeId } = req.body;
+  const { codeId, brandId } = req.body;
   try {
-    const code = await Codes.findOne({ code: codeId });
+    const code = await Codes.findOne({ code: codeId, brand: brandId });
 
     if (!code || code.status === 'invalidated') {
       return res
