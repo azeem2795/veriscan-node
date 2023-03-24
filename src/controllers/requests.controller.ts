@@ -6,7 +6,7 @@ import { Response } from 'express';
 import CodeRequest from '@interfaces/requests.interface';
 import Requests from '@models/requests.model';
 import IRequest from '@interfaces/request.interface';
-import short from 'short-uuid';
+import uid from '@utils/generateCode';
 import Codes from '@models/codes.model';
 
 /**
@@ -101,12 +101,12 @@ export const approveRequest = async (req: IRequest, res: Response): Promise<Resp
         .json({ success: false, message: 'You cannot approve a processed request' });
     }
 
-    const codes = [];
+    const codes: Array<{ code: string; brand: string }> = [];
 
     for (let i = 0; i < request.number_of_codes; i++) {
       codes.push({
-        code: short.generate(),
-        brand: request.brand,
+        code: uid(),
+        brand: request.brand as string,
       });
     }
 
