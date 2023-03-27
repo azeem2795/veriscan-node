@@ -59,7 +59,10 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
 
   try {
     const { name, email } = body; // Getting required fields from body
-    const existingUser = await Users.findOne({ $or: [{ email }, { name }] }); // Finding already existing user
+    const brandName = `^${name}$`;
+    const existingUser = await Users.findOne({
+      $or: [{ email }, { name: { $regex: brandName, $options: 'i' } }],
+    }); // Finding already existing user
 
     // Extra Validations
     if (existingUser) {
@@ -269,7 +272,9 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
   try {
     const { name } = req.params; // Getting user id from URL parameter
 
-    const brand = await Users.findOne({ name, role: 'brand' });
+    const brandName = `^${name}$`;
+
+    const brand = await Users.findOne({ name: { $regex: brandName, $options: 'i' } });
 
     if (!brand) {
       return res.status(404).json({ success: false, message: 'Brand not found' });
@@ -353,6 +358,19 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
       }
     }
 
+    const brandName = `^${body.name}$`;
+
+    const isUserExists = await Users.findOne({
+      name: { $regex: brandName, $options: 'i' },
+      _id: { $ne: userId },
+    });
+    console.log('USer exists ', isUserExists);
+
+    if (isUserExists) {
+      return res
+        .status(400)
+        .json({ success: false, message: 'User already exists with same name' });
+    }
     const user = await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
     return res.json({ success: true, user }); // Success
   } catch (err) {
