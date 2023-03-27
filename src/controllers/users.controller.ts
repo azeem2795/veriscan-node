@@ -361,15 +361,20 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
     const brandName = `^${body.name}$`;
 
     const isUserExists = await Users.findOne({
-      name: { $regex: brandName, $options: 'i' },
-      _id: { $ne: userId },
+      $or: [
+        {
+          name: { $regex: brandName, $options: 'i' },
+          _id: { $ne: userId },
+        },
+        { email: body.email },
+      ],
     });
     console.log('USer exists ', isUserExists);
 
     if (isUserExists) {
       return res
         .status(400)
-        .json({ success: false, message: 'User already exists with same name' });
+        .json({ success: false, message: 'User already exists with same name or email' });
     }
     const user = await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
     return res.json({ success: true, user }); // Success
