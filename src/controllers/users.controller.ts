@@ -366,7 +366,7 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
           name: { $regex: brandName, $options: 'i' },
           _id: { $ne: userId },
         },
-        { email: body.email },
+        { email: body.email, _id: { $ne: userId } },
       ],
     });
     console.log('USer exists ', isUserExists);
