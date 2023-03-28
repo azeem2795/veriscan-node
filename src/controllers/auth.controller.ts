@@ -9,7 +9,7 @@ import Users from '@models/users.model';
 import bcrypt from 'bcryptjs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sendForgotEmail } from '@utils/sendEmail';
-import { BCRYPT_SALT, JWT_SECRET, ORIGIN } from '@config';
+import { BCRYPT_SALT, JWT_SECRET, ADMIN } from '@config';
 
 /**
  * Login
