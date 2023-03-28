@@ -87,7 +87,7 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
     // Generating token
     const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: '15m' });
 
-    await sendInvitationEmail(email, `${ORIGIN}/verify/${token}`);
+    await sendInvitationEmail(email, `${ORIGIN}/verify/${token}`, user.name);
 
     // Done
     return res.json({ success: true, user }); // Success
