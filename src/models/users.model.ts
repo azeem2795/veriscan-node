@@ -4,6 +4,7 @@
  */
 import { model, Schema, Document } from 'mongoose';
 import User from '@interfaces/users.interface';
+import { NODE_ENV } from '@config';
 
 // Schema
 const userSchema = new Schema(
@@ -31,8 +32,7 @@ const userSchema = new Schema(
     active: {
       type: Boolean,
       required: true,
-      // TODO: Make this to false after development
-      default: true,
+      default: NODE_ENV !== 'prod',
     },
   },
   {
