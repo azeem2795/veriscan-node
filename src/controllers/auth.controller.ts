@@ -122,7 +122,7 @@ export const forgot = async (req: Request, res: Response): Promise<Response> => 
     // Generating token
     const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: '15m' });
 
-    await sendForgotEmail(email, `${ORIGIN}/verify/${token}`, user.name);
+    await sendForgotEmail(email, `${ADMIN}/verify/${token}`, user.name);
 
     // Done
     return res.json({ success: true, message: 'Email sent successfully' });
