@@ -31,6 +31,10 @@ const codeSchema = new Schema(
       ref: 'User',
       required: true,
     },
+    brand_name: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

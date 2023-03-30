@@ -8,6 +8,7 @@ import Requests from '@models/requests.model';
 import IRequest from '@interfaces/request.interface';
 import uid from '@utils/generateCode';
 import Codes from '@models/codes.model';
+import Users from '@models/users.model';
 
 /**
  * create request
@@ -101,12 +102,19 @@ export const approveRequest = async (req: IRequest, res: Response): Promise<Resp
         .json({ success: false, message: 'You cannot approve a processed request' });
     }
 
-    const codes: Array<{ code: string; brand: string }> = [];
+    const brand = await Users.findById(request.brand);
+
+    if (!brand) {
+      return res.status(404).json({ success: false, message: 'Brand not found' });
+    }
+
+    const codes: Array<{ code: string; brand: string; brand_name: string }> = [];
 
     for (let i = 0; i < request.number_of_codes; i++) {
       codes.push({
         code: uid(),
-        brand: request.brand as string,
+        brand: brand.id,
+        brand_name: brand.name,
       });
     }
 
