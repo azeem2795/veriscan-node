@@ -10,7 +10,7 @@ export default interface Code {
   status: 'pending' | 'validated' | 'invalidated';
   ip_address?: string;
   user_agent?: string;
-  validation_time?: string | Date;
+  validation_time?: string | Date | number;
   scan_attempts: number;
   brand: string | User;
   brand_name: string;
