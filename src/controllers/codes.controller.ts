@@ -121,14 +121,29 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
 
       // console.log('Code scanned ', new Date(code?.validation_time));
 
+      const formatDateTimeInAMPM = (date: string): string => {
+        const options = {
+          weekday: 'long',
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          hour: 'numeric',
+          minute: 'numeric',
+          hour12: true,
+        };
+        return date.toLocaleString(undefined, options).toLowerCase();
+      };
+      const validationTime = code?.validation_time ? new Date(code.validation_time) : null;
+      const formattedTime = validationTime ? formatDateTimeInAMPM(validationTime) : '';
+
       const message = `This code was already scanned on ${
-        code?.validation_time ? new Date(code.validation_time).toLocaleString() : ''
+        code?.validation_time ? formattedTime : ''
       }`;
 
       return res.status(400).json({
         success: false,
         status: 'used',
-        message: `This code was already scanned on ${message}`,
+        message: `${message}`,
       });
     }
 
