@@ -11,7 +11,10 @@ export default interface User {
   preferences?: {
     logo?: string;
     color?: string;
+    secondaryColor?: string;
   };
+  logoWidth?: number;
+  websiteLink?: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;

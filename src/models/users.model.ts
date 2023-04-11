@@ -25,9 +25,13 @@ const userSchema = new Schema(
       enum: ['admin', 'brand'],
       default: 'brand',
     },
+    logoWidth: { type: Number },
+    websiteLink: { type: String },
+
     preferences: {
       logo: String,
       color: String,
+      secondaryColor: String,
     },
     active: {
       type: Boolean,
