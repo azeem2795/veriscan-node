@@ -121,7 +121,7 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
 
       // console.log('Code scanned ', new Date(code?.validation_time));
 
-      const formatDateTimeInAMPM = (date: string): string => {
+      const formatDateTimeInAMPM = (date: Date): string => {
         const options = {
           weekday: 'long',
           year: 'numeric',
@@ -131,6 +131,7 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
           minute: 'numeric',
           hour12: true,
         };
+        // @ts-expect-error
         return date.toLocaleString(undefined, options).toLowerCase();
       };
       const validationTime = code?.validation_time ? new Date(code.validation_time) : null;
