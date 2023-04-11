@@ -27,8 +27,9 @@ function tostr(bytes: Buffer): string {
       r += UIDCHARS[bytes[i] % 62];
     }
   }
+  return r.toUpperCase();
 
-  return r;
+  // return r;
 }
 
 /**

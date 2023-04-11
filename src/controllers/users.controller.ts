@@ -52,6 +52,7 @@ export const createAdmin = async (req: Request, res: Response): Promise<Response
  */
 export const createBrand = async (req: Request, res: Response): Promise<Response> => {
   const body: User = req.body;
+  console.log('body', body);
 
   if (body.preferences) {
     body.preferences = JSON.parse(body.preferences as string);
@@ -285,6 +286,9 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       brand: {
         name: brand.name,
         id: brand._id,
+        logoWidth: brand.logoWidth ? brand.logoWidth : '',
+        websiteLink: brand.websiteLink ? brand.websiteLink : '',
+
         preferences: brand.preferences,
       },
     }); // Success
