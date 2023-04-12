@@ -5,6 +5,7 @@
 import { Response } from 'express';
 import Codes from '@models/codes.model';
 import IRequest from '@interfaces/request.interface';
+const moment = require('moment');
 
 /**
  * Get codes
@@ -121,23 +122,11 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
 
       // console.log('Code scanned ', new Date(code?.validation_time));
 
-      const formatDateTimeInAMPM = (date: string): string => {
-        const options = {
-          weekday: 'long',
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          hour: 'numeric',
-          minute: 'numeric',
-          hour12: true,
-        };
-        return date.toLocaleString(undefined, options).toLowerCase();
-      };
-      const validationTime = code?.validation_time ? new Date(code.validation_time) : null;
-      const formattedTime = validationTime ? formatDateTimeInAMPM(validationTime) : '';
+      const date = moment(code?.validation_time);
+      const formattedDate = date.format('M/D/YYYY h:mmA');
 
       const message = `This code was already scanned on ${
-        code?.validation_time ? formattedTime : ''
+        code?.validation_time ? formattedDate : ''
       }`;
 
       return res.status(400).json({
