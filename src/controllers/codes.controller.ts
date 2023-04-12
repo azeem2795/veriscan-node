@@ -107,10 +107,7 @@ export const invalidateCodes = async (req: IRequest, res: Response): Promise<Res
 export const validateCode = async (req: IRequest, res: Response): Promise<Response> => {
   const { codeId, brandId } = req.body;
   try {
-    const code = await Codes.findOne(
-      { code: codeId, brand: brandId },
-      { status: 1, scan_attempts: 1, validation_time: 1 },
-    );
+    const code = await Codes.findOne({ code: codeId, brand: brandId });
 
     if (!code || code.status === 'invalidated') {
       return res
@@ -125,7 +122,8 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
       return res.status(400).json({
         success: false,
         status: 'used',
-        code,
+        message: 'This code has already been scanned',
+        validationTime: code.validation_time,
       });
     }
 
