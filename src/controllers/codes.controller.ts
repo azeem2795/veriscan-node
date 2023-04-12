@@ -122,8 +122,10 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
 
       // console.log('Code scanned ', new Date(code?.validation_time));
 
+
       const date = moment(code?.validation_time);
       const formattedDate = date.format('M/D/YYYY h:mmA');
+
 
       const message = `This code was already scanned on ${
         code?.validation_time ? formattedDate : ''
