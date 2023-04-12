@@ -153,3 +153,21 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+
+/**
+ * Activate codes
+ * @param {object} req
+ * @param {object} res
+ */
+export const activateCodes = async (req: IRequest, res: Response): Promise<Response> => {
+  const { codes = [] } = req.body;
+  try {
+    await Codes.updateMany({ _id: { $in: codes } }, { status: 'pending' });
+    return res.json({ success: true, message: 'Codes activated successfully' });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};

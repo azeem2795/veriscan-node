@@ -108,13 +108,14 @@ export const approveRequest = async (req: IRequest, res: Response): Promise<Resp
       return res.status(404).json({ success: false, message: 'Brand not found' });
     }
 
-    const codes: Array<{ code: string; brand: string; brand_name: string }> = [];
+    const codes: Array<{ code: string; brand: string; brand_name: string; request: string }> = [];
 
     for (let i = 0; i < request.number_of_codes; i++) {
       codes.push({
         code: uid(),
         brand: brand.id,
         brand_name: brand.name,
+        request: request._id,
       });
     }
 
@@ -189,6 +190,70 @@ export const rejectRequest = async (req: IRequest, res: Response): Promise<Respo
     await request.save();
 
     return res.json({ success: true, message: 'Request has been rejected', request });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Reject request
+ * @param {object} req
+ * @param {object} res
+ */
+export const invalidateRequest = async (req: IRequest, res: Response): Promise<Response> => {
+  const { id } = req.params;
+  try {
+    const request = await Requests.findById(id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Request not found' });
+    }
+
+    if (request.status !== 'approved') {
+      return res
+        .status(400)
+        .json({ success: false, message: 'You cannot take action on pending/rejected request' });
+    }
+    await Requests.findByIdAndUpdate(request._id, { status: 'invalidated' });
+    await Codes.updateMany({ request: request._id, status: 'pending' }, { status: 'invalidated' });
+    return res.json({
+      success: true,
+      message: 'Codes has been invalidated for this request',
+      request,
+    });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Reject request
+ * @param {object} req
+ * @param {object} res
+ */
+export const validateRequest = async (req: IRequest, res: Response): Promise<Response> => {
+  const { id } = req.params;
+  try {
+    const request = await Requests.findById(id);
+    if (!request) {
+      return res.status(404).json({ success: false, message: 'Request not found' });
+    }
+
+    if (request.status !== 'invalidated') {
+      return res.status(400).json({ success: false, message: 'You cannot process this request' });
+    }
+    await Requests.findByIdAndUpdate(request._id, { status: 'approved' });
+    await Codes.updateMany({ request: request._id, status: 'invalidated' }, { status: 'pending' });
+    return res.json({
+      success: true,
+      message: 'Codes has been activated for this request',
+      request,
+    });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

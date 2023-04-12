@@ -10,7 +10,7 @@ export default interface CodeRequest {
   number_of_codes: number;
   text?: string;
   brand: string | User;
-  status: 'pending' | 'approved' | 'rejected';
+  status: 'pending' | 'approved' | 'rejected' | 'invalidated';
   createdAt: string;
   updatedAt: string;
 }

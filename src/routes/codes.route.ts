@@ -5,6 +5,7 @@
 import { Router } from 'express';
 import { checkUserAuth } from '@middleware/auth.middleware';
 import {
+  activateCodes,
   exportCodes,
   getCodes,
   invalidateCodes,
@@ -26,7 +27,8 @@ router.post('/validate', validateCode); // Validate a code
 router.get('/', checkUserAuth, getCodes); // get paginated codes
 router.get('/export', checkUserAuth, exportCodes); // get all codes to export in csv
 
-router.put('/invalidate', validateCodesInvalidate, isValidated, invalidateCodes); // Invalidate the codes
+router.put('/invalidate', checkUserAuth, validateCodesInvalidate, isValidated, invalidateCodes); // Invalidate the codes
+router.put('/activate', checkUserAuth, validateCodesInvalidate, isValidated, activateCodes); // Activate the codes
 
 // Export
 export default router;

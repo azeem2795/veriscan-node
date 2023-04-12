@@ -13,6 +13,7 @@ export default interface Code {
   validation_time?: string | Date | number;
   scan_attempts: number;
   brand: string | User;
+  request: string;
   brand_name: string;
   createdAt: string;
   updatedAt: string;
