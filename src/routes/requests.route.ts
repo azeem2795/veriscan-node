@@ -11,6 +11,8 @@ import {
   getAllRequests,
   getRequestById,
   approveRequest,
+  invalidateRequest,
+  validateRequest,
 } from '@controllers/requests.controller';
 import { validateCodeRequest, isValidated } from '@middleware/validations.middleware';
 
@@ -32,6 +34,9 @@ router.get('/:id', checkUserAuth, getRequestById); // Get request by id
 
 router.patch('/approve/:id', checkAdminAuth, approveRequest); // Approve a request and create codes
 router.patch('/reject/:id', checkAdminAuth, rejectRequest); // Reject a request
+
+router.patch('/invalidate/:id', checkAdminAuth, invalidateRequest); // Invalidate/Validate a request
+router.patch('/validate/:id', checkAdminAuth, validateRequest); // Invalidate/Validate a request
 
 router.delete('/:id', checkUserAuth, deleteRequest); // Delete a request
 
