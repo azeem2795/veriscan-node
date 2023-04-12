@@ -2,7 +2,6 @@
  * Code interfaces - Where we define all the interfaces for Codes
  * @author Yousuf Kalim
  */
-import { Request } from 'request';
 import User from './users.interface';
 
 export default interface Code {
@@ -14,7 +13,7 @@ export default interface Code {
   validation_time?: string | Date | number;
   scan_attempts: number;
   brand: string | User;
-  request: string | Request;
+  request: string;
   brand_name: string;
   createdAt: string;
   updatedAt: string;

@@ -212,11 +212,17 @@ export const invalidateRequest = async (req: IRequest, res: Response): Promise<R
     }
 
     if (request.status !== 'approved') {
-      return res.status(400).json({ success: false, message: 'You cannot modify pending request' });
+      return res
+        .status(400)
+        .json({ success: false, message: 'You cannot take action on pending/rejected request' });
     }
     await Requests.findByIdAndUpdate(request._id, { status: 'invalidated' });
     await Codes.updateMany({ request: request._id, status: 'pending' }, { status: 'invalidated' });
-    return res.json({ success: true, message: 'Request has been rejected', request });
+    return res.json({
+      success: true,
+      message: 'Codes has been invalidated for this request',
+      request,
+    });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
@@ -241,9 +247,13 @@ export const validateRequest = async (req: IRequest, res: Response): Promise<Res
     if (request.status !== 'invalidated') {
       return res.status(400).json({ success: false, message: 'You cannot process this request' });
     }
-    await Requests.findByIdAndUpdate(request._id, { status: 'pending' });
+    await Requests.findByIdAndUpdate(request._id, { status: 'approved' });
     await Codes.updateMany({ request: request._id, status: 'invalidated' }, { status: 'pending' });
-    return res.json({ success: true, message: 'Request has been validated', request });
+    return res.json({
+      success: true,
+      message: 'Codes has been activated for this request',
+      request,
+    });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
