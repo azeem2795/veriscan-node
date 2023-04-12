@@ -5,7 +5,6 @@
 import { Response } from 'express';
 import Codes from '@models/codes.model';
 import IRequest from '@interfaces/request.interface';
-const moment = require('moment');
 
 /**
  * Get codes
@@ -108,7 +107,10 @@ export const invalidateCodes = async (req: IRequest, res: Response): Promise<Res
 export const validateCode = async (req: IRequest, res: Response): Promise<Response> => {
   const { codeId, brandId } = req.body;
   try {
-    const code = await Codes.findOne({ code: codeId, brand: brandId });
+    const code = await Codes.findOne(
+      { code: codeId, brand: brandId },
+      { status: 1, scan_attempts: 1, validation_time: 1 },
+    );
 
     if (!code || code.status === 'invalidated') {
       return res
@@ -120,21 +122,10 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
       code.scan_attempts = code.scan_attempts + 1;
       await code.save();
 
-      // console.log('Code scanned ', new Date(code?.validation_time));
-
-
-      const date = moment(code?.validation_time);
-      const formattedDate = date.format('M/D/YYYY h:mmA');
-
-
-      const message = `This code was already scanned on ${
-        code?.validation_time ? formattedDate : ''
-      }`;
-
       return res.status(400).json({
         success: false,
         status: 'used',
-        message: `${message}`,
+        code,
       });
     }
 
