@@ -35,6 +35,11 @@ const codeSchema = new Schema(
       type: String,
       required: true,
     },
+    request: {
+      type: Schema.Types.ObjectId,
+      ref: 'Request',
+      required: true,
+    },
   },
   {
     timestamps: true,

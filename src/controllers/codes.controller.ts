@@ -79,6 +79,7 @@ export const exportCodes = async (req: IRequest, res: Response): Promise<Respons
 export const invalidateCodes = async (req: IRequest, res: Response): Promise<Response> => {
   const { codes = [] } = req.body;
   try {
+    console.log('Rike ', req.user);
     if (req.user?.role === 'admin') {
       await Codes.updateMany({ _id: { $in: codes } }, { status: 'invalidated' });
 
@@ -140,6 +141,28 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     await code.save();
 
     return res.json({ success: true, status: 'valid', message: 'This product is valid.' });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Activate codes
+ * @param {object} req
+ * @param {object} res
+ */
+export const activateCodes = async (req: IRequest, res: Response): Promise<Response> => {
+  const { codes = [] } = req.body;
+  try {
+    if (req.user?.role === 'brand') {
+      await Codes.updateMany({ _id: { $in: codes } }, { status: 'pending' });
+      return res.json({ success: true, message: 'Codes activated successfully' });
+    } else {
+      return res.json({ success: false, message: 'Access denied!' });
+    }
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
