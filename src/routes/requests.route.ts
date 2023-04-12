@@ -35,8 +35,8 @@ router.get('/:id', checkUserAuth, getRequestById); // Get request by id
 router.patch('/approve/:id', checkAdminAuth, approveRequest); // Approve a request and create codes
 router.patch('/reject/:id', checkAdminAuth, rejectRequest); // Reject a request
 
-router.patch('/invalidate/:id', checkAdminAuth, invalidateRequest); // Invalidate/Validate a request
-router.patch('/validate/:id', checkAdminAuth, validateRequest); // Invalidate/Validate a request
+router.patch('/invalidate/:id', checkUserAuth, invalidateRequest); // Invalidate/Validate a request
+router.patch('/validate/:id', checkUserAuth, validateRequest); // Invalidate/Validate a request
 
 router.delete('/:id', checkUserAuth, deleteRequest); // Delete a request
 
