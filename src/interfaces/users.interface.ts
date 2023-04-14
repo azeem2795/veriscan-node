@@ -11,6 +11,7 @@ export default interface User {
   preferences?: {
     logo?: string;
     color?: string;
+    secondaryColor?: string;
   };
   active: boolean;
   createdAt: string;

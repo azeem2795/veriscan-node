@@ -28,6 +28,7 @@ const userSchema = new Schema(
     preferences: {
       logo: String,
       color: String,
+      secondaryColor: String,
     },
     active: {
       type: Boolean,
