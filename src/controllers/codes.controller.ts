@@ -52,14 +52,14 @@ export const getCodes = async (req: IRequest, res: Response): Promise<Response> 
  * @param {object} res
  */
 export const exportCodes = async (req: IRequest, res: Response): Promise<Response> => {
-  const { brand, status } = req.query;
+  const { brand, status, request } = req.query;
   try {
     if (req.user?.role === 'admin') {
-      const codes = await Codes.find({ brand, status });
+      const codes = await Codes.find({ brand, status, request });
 
       return res.json({ success: true, codes });
     } else {
-      const codes = await Codes.find({ brand: req.user?._id, status });
+      const codes = await Codes.find({ brand: req.user?._id, status, request });
 
       return res.json({ success: true, codes });
     }

@@ -14,6 +14,7 @@ export default interface Code {
   scan_attempts: number;
   brand: string | User;
   request: string;
+  request_name: string;
   brand_name: string;
   createdAt: string;
   updatedAt: string;
