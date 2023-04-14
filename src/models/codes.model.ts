@@ -40,6 +40,10 @@ const codeSchema = new Schema(
       ref: 'Request',
       required: true,
     },
+    request_name: {
+      type: String,
+      required: true,
+    },
   },
   {
     timestamps: true,

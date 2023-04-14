@@ -108,7 +108,13 @@ export const approveRequest = async (req: IRequest, res: Response): Promise<Resp
       return res.status(404).json({ success: false, message: 'Brand not found' });
     }
 
-    const codes: Array<{ code: string; brand: string; brand_name: string; request: string }> = [];
+    const codes: Array<{
+      code: string;
+      brand: string;
+      brand_name: string;
+      request: string;
+      request_name: string;
+    }> = [];
 
     for (let i = 0; i < request.number_of_codes; i++) {
       codes.push({
@@ -116,6 +122,7 @@ export const approveRequest = async (req: IRequest, res: Response): Promise<Resp
         brand: brand.id,
         brand_name: brand.name,
         request: request._id,
+        request_name: request.name,
       });
     }
 
