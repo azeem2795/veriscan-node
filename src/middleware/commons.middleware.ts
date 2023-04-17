@@ -14,4 +14,5 @@ export default function middleware(app: Application): void {
   app.use(express.urlencoded({ extended: true })); // to get url encoded data from requests
   app.use(express.json()); // to send json data in response (It's mandatory in rest api's)
   app.use('/uploads', express.static('uploads', { maxAge: '31536000' })); // Static path to serve uploaded images with cache policy
+  app.set('trust proxy', true);
 }
