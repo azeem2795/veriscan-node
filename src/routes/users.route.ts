@@ -39,7 +39,7 @@ router.post('/brand', upload.single('logo'), validateBrand, isValidated, createB
 // Read
 router.get('/', checkAdminAuth, getAll); // Get all users at once
 router.get('/stats', checkUserAuth, getStats);
-router.get('/brand/:name', getBrandByName); // Get brand by name
+router.get('/brand/:url', getBrandByName); // Get brand by name
 router.get('/:userId', checkUserAuth, getById); // Get one user by id
 
 // Update
