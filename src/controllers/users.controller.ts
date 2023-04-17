@@ -59,10 +59,15 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
   }
 
   try {
-    const { name, email } = body; // Getting required fields from body
+    const { name, email, url } = body; // Getting required fields from body
     const brandName = `^${name}$`;
+    const brandURL = `^${url}$`;
     const existingUser = await Users.findOne({
-      $or: [{ email }, { name: { $regex: brandName, $options: 'i' } }],
+      $or: [
+        { email },
+        { name: { $regex: brandName, $options: 'i' } },
+        { url: { $regex: brandURL, $options: 'i' } },
+      ],
     }); // Finding already existing user
 
     // Extra Validations
@@ -70,7 +75,7 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
       // If we found existing user in db
       return res
         .status(409)
-        .json({ success: false, message: 'User already exists with same email or name' });
+        .json({ success: false, message: 'User already exists with same email or name or url' });
     }
 
     if (req.file?.path) {
@@ -271,11 +276,14 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
  */
 export const getBrandByName = async (req: IRequest, res: Response): Promise<Response> => {
   try {
-    const { name } = req.params; // Getting user id from URL parameter
+    const { url } = req.params; // Getting user id from URL parameter
 
-    const brandName = `^${name}$`;
+    const brandurl = `/${url}`;
+    console.log('sss', brandurl);
 
-    const brand = await Users.findOne({ name: { $regex: brandName, $options: 'i' } });
+    // const brand = await Users.findOne({ url: { $regex: brandurl, $options: 'i' } });
+    const brand = await Users.findOne({ url: brandurl });
+    console.log(brand);
 
     if (!brand) {
       return res.status(404).json({ success: false, message: 'Brand not found' });

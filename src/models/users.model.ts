@@ -27,6 +27,7 @@ const userSchema = new Schema(
     },
     logoWidth: { type: Number },
     websiteLink: { type: String },
+    url: { type: String },
 
     preferences: {
       logo: String,
