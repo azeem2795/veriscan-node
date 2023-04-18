@@ -8,7 +8,7 @@ import crypto from 'crypto';
  * 62 characters in the ascii range that can be used in URLs without special
  * encoding.
  */
-const UIDCHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+const UIDCHARS = 'ABCDEFGHJKLMNPQRSTUVWXYabcdefghijklmnopqrstuvwxyz3456789';
 
 /**
  * Make a Buffer into a string ready for use in URLs
@@ -22,14 +22,12 @@ function tostr(bytes: Buffer): string {
 
   for (let i = 0; i < bytes.length; i++) {
     if (i === bytes.length / 2) {
-      r += `-${UIDCHARS[bytes[i] % 62]}`;
+      r += `-${UIDCHARS[bytes[i] % 56]}`;
     } else {
-      r += UIDCHARS[bytes[i] % 62];
+      r += UIDCHARS[bytes[i] % 56];
     }
   }
   return r.toUpperCase();
-
-  // return r;
 }
 
 /**
