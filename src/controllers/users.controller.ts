@@ -379,10 +379,14 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
         { email: body.email, _id: { $ne: userId } },
       ],
     });
-    const isUrlExist = await Users.findOne({ url: { $regex: body.url, $options: 'i' } });
+    if (req?.user?.role === 'admin') {
+      const isUrlExist = await Users.findOne({ url: { $regex: body.url, $options: 'i' } });
 
-    if (isUrlExist) {
-      return res.status(400).json({ success: false, message: 'User already exists with same url' });
+      if (isUrlExist) {
+        return res
+          .status(400)
+          .json({ success: false, message: 'User already exists with same url' });
+      }
     }
 
     if (isUserExists) {
