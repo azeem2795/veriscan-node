@@ -279,11 +279,9 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
     const { url } = req.params; // Getting user id from URL parameter
 
     const brandurl = `/${url}`;
-    console.log('sss', brandurl);
 
     // const brand = await Users.findOne({ url: { $regex: brandurl, $options: 'i' } });
     const brand = await Users.findOne({ url: brandurl });
-    console.log(brand);
 
     if (!brand) {
       return res.status(404).json({ success: false, message: 'Brand not found' });
@@ -381,7 +379,11 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
         { email: body.email, _id: { $ne: userId } },
       ],
     });
-    console.log('USer exists ', isUserExists);
+    const isUrlExist = await Users.findOne({ url: { $regex: body.url, $options: 'i' } });
+
+    if (isUrlExist) {
+      return res.status(400).json({ success: false, message: 'User already exists with same url' });
+    }
 
     if (isUserExists) {
       return res
