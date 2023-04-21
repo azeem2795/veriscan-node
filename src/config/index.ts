@@ -15,3 +15,4 @@ export const JWT_SECRET = process.env.JWT_SECRET ?? 'secret';
 export const HOST = process.env.HOST ?? 'http://localhost:5000';
 export const ORIGIN = process.env.ORIGIN ?? 'http://localhost:3000';
 export const ADMIN = process.env.ADMIN ?? 'http://localhost:3001';
+export const CLIENT = process.env.CLIENT ?? process.env.ADMIN ?? 'http://localhost:3001';

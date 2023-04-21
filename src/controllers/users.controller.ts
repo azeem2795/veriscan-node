@@ -8,7 +8,7 @@ import Requests from '@models/requests.model';
 import Codes from '@models/codes.model';
 import User from '@interfaces/users.interface';
 import bcrypt from 'bcryptjs';
-import { BCRYPT_SALT, JWT_SECRET, ADMIN } from '@config';
+import { BCRYPT_SALT, JWT_SECRET, CLIENT } from '@config';
 import IRequest from '@interfaces/request.interface';
 import { sendInvitationEmail } from '@utils/sendEmail';
 import jwt from 'jsonwebtoken';
@@ -93,7 +93,7 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
     // Generating token
     const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: '15m' });
 
-    await sendInvitationEmail(email, `${ADMIN}/verify/${token}`, user.name);
+    await sendInvitationEmail(email, `${CLIENT}/verify/${token}`, user.name);
 
     // Done
     return res.json({ success: true, user }); // Success
