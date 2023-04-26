@@ -166,6 +166,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         validatedCodesCount,
         brands,
         pendingCodeRequests,
+        allRequests,
       ] = await Promise.all([
         Users.find({ role: 'brand' }).countDocuments(),
         Requests.find().countDocuments(),
@@ -173,6 +174,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         Codes.find({ status: 'validated' }).countDocuments(),
         Users.find({ role: 'brand' }).select({ createdAt: 1 }),
         Requests.find({ status: 'pending' }).sort({ createdAt: -1 }).limit(7),
+        Requests.find().populate('brand').sort({ createdAt: -1 }),
       ]);
 
       const now = new Date();
@@ -202,6 +204,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
           validatedCodesCount,
           stats,
           pendingCodeRequests,
+          allRequests,
         },
       });
     } else if (role === 'brand') {
@@ -212,6 +215,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         allCodesCount,
         pendingCodeRequests,
         validatedCodes,
+        allRequests,
       ] = await Promise.all([
         Requests.find({ brand: _id }).countDocuments(),
         Codes.find({
@@ -227,6 +231,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         }).countDocuments(),
         Requests.find({ brand: _id, status: 'pending' }).sort({ createdAt: -1 }).limit(7),
         Codes.find({ brand: _id, status: 'validated' }),
+        Requests.find({ brand: _id }).populate('brand').sort({ createdAt: -1 }),
       ]);
 
       const now = new Date();
@@ -256,6 +261,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
           allCodesCount,
           stats,
           pendingCodeRequests,
+          allRequests,
         },
       });
     } else {
