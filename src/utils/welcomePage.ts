@@ -7,8 +7,7 @@ import { APP_NAME } from '@config';
 const welcomePage = `<!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome</title>
-    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <title>Welcome to the VeriScan API</title>
     <style>
         * {
             padding: 0;
@@ -30,18 +29,22 @@ const welcomePage = `<!DOCTYPE html>
 
         .Hero-logo {
             height: 40vmin;
-            pointer-events: none;
             margin-bottom: 10px;
+            filter: hue-rotate(110deg);
+            animation: Hero-logo-spin infinite 20s linear;
         }
 
-        @media (prefers-reduced-motion: no-preference) {
-            .Hero-logo {
-                animation: Hero-logo-spin infinite 20s linear;
+        @keyframes Hero-logo-spin {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
             }
         }
 
         .Hero-header {
-            background-color: #282c34;
+            background-color: #0080ff;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
@@ -53,16 +56,17 @@ const welcomePage = `<!DOCTYPE html>
 
         .Hero-header p {
             font-size: 20px;
-            line-height: 2.5;
+            line-height: 1.5;
+            margin-bottom: 10px;
         }
 
-        @keyframes Hero-logo-spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
+        .Hero-header a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        .Hero-header a:hover {
+            color: #80c9ff;
         }
     </style>
 </head>
@@ -71,13 +75,15 @@ const welcomePage = `<!DOCTYPE html>
     <div class="Hero">
         <header class="Hero-header">
             <img src="https://cdn-icons-png.flaticon.com/512/5968/5968322.png" class="Hero-logo" alt="logo" />
-            <h4>Welcome to ${APP_NAME}</h4>
-            <p>This is the main route of the application.</p>
+            <h4>Welcome to VeriScan</h4>
+            <p>This is the main route of VeriScan.</p>
+            <p>If you are here by mistake, please visit <a href="https://getveriscan.com">getveriscan.com</a> for more information.</p>
         </header>
     </div>
 </div>
 </body>
 </html>
+
 `;
 
 export default welcomePage;
