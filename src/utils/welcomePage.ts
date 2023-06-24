@@ -1,3 +1,9 @@
+/**
+ * Welcome page for the application.
+ * @author Yousuf Kalim
+ */
+import { APP_NAME } from '@config';
+
 const welcomePage = `<!DOCTYPE html>
 <html>
 <head>
@@ -6,27 +12,50 @@ const welcomePage = `<!DOCTYPE html>
     <style>
         * {
             padding: 0;
-@@ -30,18 +29,22 @@ const welcomePage = `<!DOCTYPE html>
+            margin: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu',
+            'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .Hero {
+            text-align: center;
+        }
+
         .Hero-logo {
             height: 40vmin;
             pointer-events: none;
             margin-bottom: 10px;
         }
+
         @media (prefers-reduced-motion: no-preference) {
             .Hero-logo {
                 animation: Hero-logo-spin infinite 20s linear;
             }
         }
+
         .Hero-header {
             background-color: #282c34;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-@@ -53,16 +56,17 @@ const welcomePage = `<!DOCTYPE html>
+            align-items: center;
+            justify-content: center;
+            font-size: calc(10px + 2vmin);
+            color: white;
+        }
+
         .Hero-header p {
             font-size: 20px;
             line-height: 2.5;
         }
+
         @keyframes Hero-logo-spin {
             from {
                 transform: rotate(0deg);
@@ -37,7 +66,8 @@ const welcomePage = `<!DOCTYPE html>
         }
     </style>
 </head>
-@@ -71,13 +75,15 @@ const welcomePage = `<!DOCTYPE html>
+<body>
+<div class="app">
     <div class="Hero">
         <header class="Hero-header">
             <img src="https://cdn-icons-png.flaticon.com/512/5968/5968322.png" class="Hero-logo" alt="logo" />
