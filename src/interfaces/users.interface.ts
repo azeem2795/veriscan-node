@@ -16,6 +16,7 @@ export default interface User {
   logoWidth?: number;
   websiteLink?: string;
   url?: string;
+  socialMedia?: [];
   active: boolean;
   createdAt: string;
   updatedAt: string;
