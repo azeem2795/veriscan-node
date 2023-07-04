@@ -415,6 +415,68 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+export const updateBrandBackground = async (req: IRequest, res: Response): Promise<Response> => {
+  const body: any = req.body;
+  const data = {
+    img: '',
+    type: '',
+    selectedImg: '',
+    color: '',
+  };
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
+    if (body.type === 'img') {
+      if (req.file?.path) {
+        data.img = req.file.path;
+        data.type = body.type;
+        data.selectedImg = '';
+        data.color = '';
+
+        // upload in array db push
+        await Users.findByIdAndUpdate(
+          userId,
+          { $push: { backgroundimages: req.file.path } },
+          { new: true },
+        );
+      }
+    } else if (body.type === 'color') {
+      data.img = '';
+      data.type = body.type;
+      data.selectedImg = '';
+      data.color = body.color;
+    } else if (body.type === 'NoBG') {
+      data.img = '';
+      data.type = body.type;
+      data.selectedImg = '';
+      data.color = '';
+    } else if (body.type === 'default') {
+      console.log('defult clg', body.type);
+      data.type = body.type;
+    } else {
+      data.img = '';
+      data.type = 'Selected';
+      data.selectedImg = body.selectedImg;
+      data.color = '';
+    }
+
+    console.log('data for update ', data);
+
+    await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
 
 /**
  * Change status of a user

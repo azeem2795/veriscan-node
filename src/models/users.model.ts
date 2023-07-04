@@ -34,6 +34,32 @@ const userSchema = new Schema(
       color: String,
       secondaryColor: String,
     },
+    typography: {
+      heading: {
+        fontName: String,
+        fontWeight: String,
+        fontSize: String,
+      },
+      paragraph: {
+        fontName: String,
+        fontWeight: String,
+        fontSize: String,
+      },
+      body: {
+        fontName: String,
+        fontWeight: String,
+        fontSize: String,
+      },
+    },
+    background: {
+      type: {
+        type: String,
+      },
+      img: String,
+      color: String,
+      selectedImg: String,
+    },
+    backgroundimages: [{ type: String }],
     active: {
       type: Boolean,
       required: true,

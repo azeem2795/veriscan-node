@@ -11,12 +11,13 @@ import {
   getById,
   deleteAdmin,
   updateBrand,
+  updateBrandBackground,
   getBrandByName,
   getStats,
   changeStatus,
 } from '@controllers/users.controller';
 import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
-import { upload } from '@middleware/multer.middleware';
+import { upload, backgroundUpload } from '@middleware/multer.middleware';
 import { validateAdmin, validateBrand, isValidated } from '@middleware/validations.middleware';
 const router = Router();
 
@@ -45,6 +46,12 @@ router.get('/:userId', checkUserAuth, getById); // Get one user by id
 // Update
 router.put('/admin', checkAdminAuth, updateAdmin); // Update an admin
 router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by id
+router.put(
+  '/brand/bgImg/:userId',
+  checkUserAuth,
+  backgroundUpload.single('img'),
+  updateBrandBackground,
+); // Update a specific brand by id
 
 router.patch('/change-status/:id', checkAdminAuth, changeStatus); // Deactivate a user
 

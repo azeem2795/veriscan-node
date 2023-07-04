@@ -22,5 +22,22 @@ const upload = multer({
     fileSize: 1024 * 1024 * 5,
   },
 });
+const backgroundUpload = multer({
+  // to store images
+  storage: multer.diskStorage({
+    // Defining the path where we have to store the image
+    destination: function (_req, _file, cb) {
+      cb(null, './uploads/backgroundImages'); // Callback
+    },
+    // Creating a unique filename to avoid duplication error
+    filename: function (_req, file, cb) {
+      cb(null, `${Date.now()} -  ${file.originalname}`); // Callback
+    },
+  }),
+  // File size limit upto 5 mb
+  limits: {
+    fileSize: 1024 * 1024 * 5,
+  },
+});
 
-export { upload };
+export { upload, backgroundUpload };
