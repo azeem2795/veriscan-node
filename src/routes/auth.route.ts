@@ -31,6 +31,7 @@ const router = Router();
 
 // Read
 router.post('/login', validateLogin, isValidated, login); // Get all users at once
+router.post('/verify-code', login); // Verify Two factor authentication
 
 router.get('/', checkUserAuth, confirmAuth); // Check user auth
 router.get('/verify-token/:token', verifyToken); // Verify user token
