@@ -92,7 +92,7 @@ export const sendOtpCodeEmail = async (email: string, code: number): Promise<obj
     const mailOptions = {
       from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
       to: email,
-      subject: 'Set password to activate your account',
+      subject: 'Two factor verification',
       text: `Your verification code is  \n \n ${code} \n \n Please enter it to login.`,
     };
 
@@ -102,7 +102,6 @@ export const sendOtpCodeEmail = async (email: string, code: number): Promise<obj
         // Error
         reject(error);
       } else {
-        console.log('Email sent=======> ');
         // Success
         resolve({ success: true, message: 'Email sent successfully' });
       }

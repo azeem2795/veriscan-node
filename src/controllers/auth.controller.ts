@@ -32,8 +32,6 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
 
-    console.log('User ===> ', user);
-
     if (!user.password || !user.active) {
       // If user is not activated
       return res.status(404).json({ success: false, message: 'Your account is not activated' });
@@ -57,8 +55,6 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     const code = parseInt(otp);
     await sendOtpCodeEmail(email, code);
     user.code = code;
-
-    console.log('USer ', user);
 
     await user.save();
 
@@ -204,6 +200,7 @@ export const verifyCode = async (req: Request, res: Response): Promise<Response>
 
     // Creating payload with user object
     delete user.password; // Removing password from user object
+    delete user.code; // Removing password from user object
     const payload = { user };
 
     // Generating token

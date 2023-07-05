@@ -369,7 +369,6 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
         { email: body.email, _id: { $ne: userId } },
       ],
     });
-    console.log('USer exists ', isUserExists);
 
     if (isUserExists) {
       return res
