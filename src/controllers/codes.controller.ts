@@ -119,16 +119,11 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
       code.scan_attempts = code.scan_attempts + 1;
       await code.save();
 
-      // console.log('Code scanned ', new Date(code?.validation_time));
-
-      const message = `This code was already scanned on ${
-        code?.validation_time ? new Date(code.validation_time).toLocaleString() : ''
-      }`;
-
       return res.status(400).json({
         success: false,
         status: 'used',
-        message: `This code was already scanned on ${message}`,
+        message: 'This code has already been scanned',
+        validationTime: code.validation_time,
       });
     }
 

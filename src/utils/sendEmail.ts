@@ -3,11 +3,17 @@
  * @author Yousuf Kalim
  */
 import nodemailer from 'nodemailer';
-import { MAILER_DOMAIN, MAILER_EMAIL, MAILER_PASSWORD } from 'config';
+import { MAILER_HOST, MAILER_PORT, MAILER_DOMAIN, MAILER_EMAIL, MAILER_PASSWORD } from 'config';
 
 // Sender mail server config
 const transporter = nodemailer.createTransport({
-  service: 'gmail',
+  // @ts-expect-error
+  host: MAILER_HOST,
+  port: MAILER_PORT,
+  tls: {
+    ciphers: 'SSLv3',
+    rejectUnauthorized: true,
+  },
   auth: {
     user: MAILER_EMAIL,
     pass: MAILER_PASSWORD,
@@ -18,6 +24,7 @@ const transporter = nodemailer.createTransport({
  * sendEmail
  * @param {string} email
  * @param {string} token
+ * @param userName
  * @return {void}
  */
 export const sendForgotEmail = async (
@@ -51,6 +58,7 @@ export const sendForgotEmail = async (
  * send invitation email
  * @param {string} email
  * @param {string} token
+ * @param userName
  * @return {void}
  */
 export const sendInvitationEmail = async (
@@ -64,7 +72,7 @@ export const sendInvitationEmail = async (
       from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
       to: email,
       subject: 'Set password to activate your account',
-      text: `Welcome ${userName}, \n \n You have successfully registered to VeriScan. Follow the link below to set your password \n \n ${token} \n \n Thanks.`,
+      text: `Welcome ${userName}, \n \n You have successfully registered to VeriScan. Follow the link below to set your password \n \n ${token} \n \n Should you require any assistance or have any queries, our dedicated support team is ready to assist you. Please feel free to reach out to us via email at support@getveriscan.com. \n \n Thank you for choosing VeriScan.`,
     };
 
     // Sending email

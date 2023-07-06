@@ -8,7 +8,7 @@ import Requests from '@models/requests.model';
 import Codes from '@models/codes.model';
 import User from '@interfaces/users.interface';
 import bcrypt from 'bcryptjs';
-import { BCRYPT_SALT, JWT_SECRET, ADMIN } from '@config';
+import { BCRYPT_SALT, JWT_SECRET, CLIENT } from '@config';
 import IRequest from '@interfaces/request.interface';
 import { sendInvitationEmail } from '@utils/sendEmail';
 import jwt from 'jsonwebtoken';
@@ -52,16 +52,22 @@ export const createAdmin = async (req: Request, res: Response): Promise<Response
  */
 export const createBrand = async (req: Request, res: Response): Promise<Response> => {
   const body: User = req.body;
+  console.log('body', body);
 
   if (body.preferences) {
     body.preferences = JSON.parse(body.preferences as string);
   }
 
   try {
-    const { name, email } = body; // Getting required fields from body
+    const { name, email, url } = body; // Getting required fields from body
     const brandName = `^${name}$`;
+    const brandURL = `^${url}$`;
     const existingUser = await Users.findOne({
-      $or: [{ email }, { name: { $regex: brandName, $options: 'i' } }],
+      $or: [
+        { email },
+        { name: { $regex: brandName, $options: 'i' } },
+        { url: { $regex: brandURL, $options: 'i' } },
+      ],
     }); // Finding already existing user
 
     // Extra Validations
@@ -69,7 +75,7 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
       // If we found existing user in db
       return res
         .status(409)
-        .json({ success: false, message: 'User already exists with same email or name' });
+        .json({ success: false, message: 'User already exists with same email or name or url' });
     }
 
     if (req.file?.path) {
@@ -87,7 +93,7 @@ export const createBrand = async (req: Request, res: Response): Promise<Response
     // Generating token
     const token = jwt.sign({ user }, JWT_SECRET, { expiresIn: '15m' });
 
-    await sendInvitationEmail(email, `${ADMIN}/verify/${token}`, user.name);
+    await sendInvitationEmail(email, `${CLIENT}/verify/${token}`, user.name);
 
     // Done
     return res.json({ success: true, user }); // Success
@@ -160,6 +166,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         validatedCodesCount,
         brands,
         pendingCodeRequests,
+        allRequests,
       ] = await Promise.all([
         Users.find({ role: 'brand' }).countDocuments(),
         Requests.find().countDocuments(),
@@ -167,6 +174,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         Codes.find({ status: 'validated' }).countDocuments(),
         Users.find({ role: 'brand' }).select({ createdAt: 1 }),
         Requests.find({ status: 'pending' }).sort({ createdAt: -1 }).limit(7),
+        Requests.find().populate('brand').sort({ createdAt: -1 }),
       ]);
 
       const now = new Date();
@@ -196,6 +204,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
           validatedCodesCount,
           stats,
           pendingCodeRequests,
+          allRequests,
         },
       });
     } else if (role === 'brand') {
@@ -206,6 +215,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         allCodesCount,
         pendingCodeRequests,
         validatedCodes,
+        allRequests,
       ] = await Promise.all([
         Requests.find({ brand: _id }).countDocuments(),
         Codes.find({
@@ -221,6 +231,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         }).countDocuments(),
         Requests.find({ brand: _id, status: 'pending' }).sort({ createdAt: -1 }).limit(7),
         Codes.find({ brand: _id, status: 'validated' }),
+        Requests.find({ brand: _id }).populate('brand').sort({ createdAt: -1 }),
       ]);
 
       const now = new Date();
@@ -250,6 +261,7 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
           allCodesCount,
           stats,
           pendingCodeRequests,
+          allRequests,
         },
       });
     } else {
@@ -270,11 +282,12 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
  */
 export const getBrandByName = async (req: IRequest, res: Response): Promise<Response> => {
   try {
-    const { name } = req.params; // Getting user id from URL parameter
+    const { url } = req.params; // Getting user id from URL parameter
 
-    const brandName = `^${name}$`;
+    const brandurl = `/${url}`;
 
-    const brand = await Users.findOne({ name: { $regex: brandName, $options: 'i' } });
+    // const brand = await Users.findOne({ url: { $regex: brandurl, $options: 'i' } });
+    const brand = await Users.findOne({ url: brandurl });
 
     if (!brand) {
       return res.status(404).json({ success: false, message: 'Brand not found' });
@@ -285,6 +298,9 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       brand: {
         name: brand.name,
         id: brand._id,
+        logoWidth: brand.logoWidth ? brand.logoWidth : '',
+        websiteLink: brand.websiteLink ? brand.websiteLink : '',
+
         preferences: brand.preferences,
       },
     }); // Success
@@ -333,6 +349,7 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
   if (body.preferences) {
     body.preferences = JSON.parse(body.preferences as string);
   }
+  console.log('body', body);
 
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
@@ -349,19 +366,19 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
     }
 
     if (req.file?.path) {
-      if (body.preferences) {
-        body.preferences.logo = req.file.path;
-      } else {
-        body.preferences = {
-          logo: req.file.path,
-        };
-      }
+      body.logo = req.file.path;
     }
 
     const brandName = `^${body.name}$`;
+    const brandUrl = `^${body.url}$`;
+    console.log('brandName', brandName);
 
     const isUserExists = await Users.findOne({
       $or: [
+        {
+          url: { $regex: brandUrl, $options: 'i' },
+          _id: { $ne: userId },
+        },
         {
           name: { $regex: brandName, $options: 'i' },
           _id: { $ne: userId },
@@ -369,14 +386,243 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
         { email: body.email, _id: { $ne: userId } },
       ],
     });
+    // if (req?.user?.role === 'admin') {
+    //   const isUrlExist = await Users.findOne({ url: { $regex: body.url, $options: 'i' } });
+
+    //   if (isUrlExist) {
+    //     return res
+    //       .status(400)
+    //       .json({ success: false, message: 'User already exists with same url' });
+    //   }
+    // }
 
     if (isUserExists) {
       return res
         .status(400)
-        .json({ success: false, message: 'User already exists with same name or email' });
+        .json({ success: false, message: 'User already exists with same name or email or url' });
     }
     const user = await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
     return res.json({ success: true, user }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const updateBrandDescription = async (req: IRequest, res: Response): Promise<Response> => {
+  const body: User = req.body;
+
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
+    console.log('body', body);
+    await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const updateBrandBackground = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line quote-props
+  const body: any = req.body;
+  const data = {
+    img: '',
+    type: '',
+    selectedImg: '',
+    color: '',
+  };
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
+    if (body.type === 'img') {
+      if (req.file?.path) {
+        data.img = req.file.path;
+        data.type = body.type;
+        data.selectedImg = '';
+        data.color = '';
+
+        // upload in array db push
+        await Users.findByIdAndUpdate(
+          userId,
+          { $push: { backgroundimages: req.file.path } },
+          { new: true },
+        );
+      }
+    } else if (body.type === 'color') {
+      data.img = '';
+      data.type = body.type;
+      data.selectedImg = '';
+      data.color = body.color;
+    } else if (body.type === 'NoBG') {
+      data.img = '';
+      data.type = body.type;
+      data.selectedImg = '';
+      data.color = '';
+    } else if (body.type === 'default') {
+      console.log('defult clg', body.type);
+      data.type = body.type;
+    } else {
+      data.img = '';
+      data.type = 'Selected';
+      data.selectedImg = body.selectedImg;
+      data.color = '';
+    }
+
+    console.log('data for update ', data);
+
+    await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const updateFavIcon = async (req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    console.log('req.file.path', req.file?.path);
+    console.log('req.body', req.body);
+    if (req.file?.path) {
+      await Users.findByIdAndUpdate(
+        userId,
+        {
+          $set: { favIcon: req.file.path },
+          $push: { favIcons: req.file.path },
+        },
+        { new: true },
+      );
+    } else {
+      await Users.findByIdAndUpdate(
+        userId,
+        {
+          $set: { favIcon: req.body?.favIcon },
+        },
+        { new: true },
+      );
+    }
+
+    // await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const socialMediaUpdate = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line quote-props
+  const body: any = req.body;
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    console.log('userId', userId);
+    console.log('body', body);
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
+    const existingUser = await Users.findOne({
+      _id: userId,
+      'socialMedia.platform': body.platform,
+    });
+
+    if (existingUser) {
+      // Update the link if the platform already exists
+      await Users.findOneAndUpdate(
+        { _id: userId, 'socialMedia.platform': body.platform },
+        { $set: { 'socialMedia.$.link': body.link } },
+        { new: true },
+      );
+    } else {
+      // Add a new social media entry if the platform doesn't exist
+      await Users.findByIdAndUpdate(
+        userId,
+        { $push: { socialMedia: { platform: body.platform, link: body.link } } },
+        { new: true },
+      );
+    }
+
+    // await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const customeBtnUpdate = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line quote-props
+  const body: any = req.body;
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    console.log('userId', userId);
+    console.log('body', body);
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    // await Users.findByIdAndUpdate(userId, { customizeButton:body }, { new: true });
+
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const deleteSocialMedia = async (req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+    const platformId = req.params.platformId; // Getting user id from URL parameter
+
+    console.log('userId', userId);
+    console.log('platformId', platformId);
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    await Users.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { socialMedia: { _id: platformId } } },
+      { new: true },
+    );
+
+    // await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
