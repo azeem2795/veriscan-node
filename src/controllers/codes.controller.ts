@@ -122,13 +122,14 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
       const ipAddress = req.ip;
       const location: any = await axios.get(`http://ip-api.com/json/${ipAddress}`);
 
-      if (location && code) {
+      if (location?.data && code) {
+        const { data } = location;
         const locationData = {
-          city: location?.city,
-          country: location?.country,
+          city: data?.city,
+          country: data?.country,
           ip_address: ipAddress,
-          lat: location?.lat,
-          long: location?.lon,
+          lat: data?.lat,
+          long: data?.lon,
         };
         code.invalid_attempts?.push(locationData);
       }
