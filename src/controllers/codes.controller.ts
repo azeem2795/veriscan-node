@@ -3,6 +3,7 @@
  * @author Yousuf Kalim
  */
 import { Response } from 'express';
+import axios from 'axios';
 import Codes from '@models/codes.model';
 import IRequest from '@interfaces/request.interface';
 
@@ -115,7 +116,23 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
         .json({ success: false, status: 'invalid', message: 'This code is invalid.' });
     }
 
+    console.log('Learn git task scenario');
+
     if (code.status === 'validated') {
+      const ipAddress = req.ip;
+      const location: any = await axios.get(`http://ip-api.com/json/${ipAddress}`);
+
+      if (location && code) {
+        const locationData = {
+          city: location?.city,
+          country: location?.country,
+          ip_address: ipAddress,
+          lat: location?.lat,
+          long: location?.lon,
+        };
+        code.invalid_attempts?.push(locationData);
+      }
+
       code.scan_attempts = code.scan_attempts + 1;
       await code.save();
 
