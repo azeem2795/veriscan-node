@@ -349,6 +349,7 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
   if (body.preferences) {
     body.preferences = JSON.parse(body.preferences as string);
   }
+  console.log('body', body);
 
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
@@ -365,13 +366,7 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
     }
 
     if (req.file?.path) {
-      if (body.preferences) {
-        body.preferences.logo = req.file.path;
-      } else {
-        body.preferences = {
-          logo: req.file.path,
-        };
-      }
+      body.logo = req.file.path;
     }
 
     const brandName = `^${body.name}$`;
@@ -415,7 +410,30 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+export const updateBrandDescription = async (req: IRequest, res: Response): Promise<Response> => {
+  const body: User = req.body;
+
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
+    console.log('body', body);
+    await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
 export const updateBrandBackground = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line quote-props
   const body: any = req.body;
   const data = {
     img: '',
@@ -469,6 +487,141 @@ export const updateBrandBackground = async (req: IRequest, res: Response): Promi
     console.log('data for update ', data);
 
     await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const updateFavIcon = async (req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    console.log('req.file.path', req.file?.path);
+    console.log('req.body', req.body);
+    if (req.file?.path) {
+      await Users.findByIdAndUpdate(
+        userId,
+        {
+          $set: { favIcon: req.file.path },
+          $push: { favIcons: req.file.path },
+        },
+        { new: true },
+      );
+    } else {
+      await Users.findByIdAndUpdate(
+        userId,
+        {
+          $set: { favIcon: req.body?.favIcon },
+        },
+        { new: true },
+      );
+    }
+
+    // await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const socialMediaUpdate = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line quote-props
+  const body: any = req.body;
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    console.log('userId', userId);
+    console.log('body', body);
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+
+    const existingUser = await Users.findOne({
+      _id: userId,
+      'socialMedia.platform': body.platform,
+    });
+
+    if (existingUser) {
+      // Update the link if the platform already exists
+      await Users.findOneAndUpdate(
+        { _id: userId, 'socialMedia.platform': body.platform },
+        { $set: { 'socialMedia.$.link': body.link } },
+        { new: true },
+      );
+    } else {
+      // Add a new social media entry if the platform doesn't exist
+      await Users.findByIdAndUpdate(
+        userId,
+        { $push: { socialMedia: { platform: body.platform, link: body.link } } },
+        { new: true },
+      );
+    }
+
+    // await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const customeBtnUpdate = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line quote-props
+  const body: any = req.body;
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    console.log('userId', userId);
+    console.log('body', body);
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    // await Users.findByIdAndUpdate(userId, { customizeButton:body }, { new: true });
+
+    return res.json({ success: true }); // Success
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const deleteSocialMedia = async (req: IRequest, res: Response): Promise<Response> => {
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+    const platformId = req.params.platformId; // Getting user id from URL parameter
+
+    console.log('userId', userId);
+    console.log('platformId', platformId);
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    await Users.findOneAndUpdate(
+      { _id: userId },
+      { $pull: { socialMedia: { _id: platformId } } },
+      { new: true },
+    );
+
+    // await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling

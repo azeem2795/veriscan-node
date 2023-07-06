@@ -11,7 +11,12 @@ import {
   getById,
   deleteAdmin,
   updateBrand,
+  updateBrandDescription,
   updateBrandBackground,
+  socialMediaUpdate,
+  customeBtnUpdate,
+  updateFavIcon,
+  deleteSocialMedia,
   getBrandByName,
   getStats,
   changeStatus,
@@ -46,12 +51,19 @@ router.get('/:userId', checkUserAuth, getById); // Get one user by id
 // Update
 router.put('/admin', checkAdminAuth, updateAdmin); // Update an admin
 router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by id
+router.put('/brand/description/:userId', checkUserAuth, updateBrandDescription); // Update a specific brand by id
 router.put(
   '/brand/bgImg/:userId',
   checkUserAuth,
   backgroundUpload.single('img'),
   updateBrandBackground,
 ); // Update a specific brand by id
+
+router.put('/brand/favIcon/:userId', checkUserAuth, upload.single('favIcon'), updateFavIcon); // Update a specific brand by id
+
+router.put('/brand/socialLinks/:userId', checkUserAuth, socialMediaUpdate); // Update a specific brand by id
+router.put('/brand/customButton/:userId', checkUserAuth, customeBtnUpdate); // Update a specific brand by id
+router.delete('/brand/socialLinks/:userId/:platformId', checkUserAuth, deleteSocialMedia); // Update a specific brand by id
 
 router.patch('/change-status/:id', checkAdminAuth, changeStatus); // Deactivate a user
 
