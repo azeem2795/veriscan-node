@@ -117,12 +117,15 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
         .json({ success: false, status: 'invalid', message: 'This code is invalid.' });
     }
 
-    console.log('Learn git task scenario');
-
     if (code.status === 'validated') {
       const location = await getLocationByIP(ipAddress);
       if (location) {
-        code.invalid_attempts?.push(location);
+        const ifExist = code?.invalid_attempts?.find(
+          (item) => item.lat === location?.lat && item.long === location.long,
+        );
+        if (!ifExist) {
+          code.invalid_attempts?.push(location);
+        }
       }
 
       code.scan_attempts = code.scan_attempts + 1;
