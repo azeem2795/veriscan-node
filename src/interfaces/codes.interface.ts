@@ -12,6 +12,14 @@ export interface InvalidAttempts {
   country: string;
 }
 
+export interface IValidAttemptLocation {
+  ip_address: string;
+  lat: string;
+  long: string;
+  city: string;
+  country: string;
+}
+
 export default interface Code {
   _id: string;
   code: string;
@@ -21,6 +29,7 @@ export default interface Code {
   validation_time?: string | Date | number;
   scan_attempts: number;
   invalid_attempts?: InvalidAttempts[];
+  valid_attempt_location?: IValidAttemptLocation;
   brand: string | User;
   request: string;
   request_name: string;
