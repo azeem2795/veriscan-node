@@ -116,6 +116,8 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
         .json({ success: false, status: 'invalid', message: 'This code is invalid.' });
     }
 
+    console.log('Learn git task scenario');
+
     if (code.status === 'validated') {
       const ipAddress = req.ip;
       const location: any = await axios.get(`http://ip-api.com/json/${ipAddress}`);
