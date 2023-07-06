@@ -3,6 +3,7 @@
  * @author Yousuf Kalim
  */
 import { Response } from 'express';
+import axios from 'axios';
 import Codes from '@models/codes.model';
 import IRequest from '@interfaces/request.interface';
 
@@ -109,6 +110,8 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
   try {
     const code = await Codes.findOne({ code: codeId, brand: brandId });
 
+    console.log('Ip address ', req.ip);
+
     if (!code || code.status === 'invalidated') {
       return res
         .status(404)
@@ -116,6 +119,20 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     }
 
     if (code.status === 'validated') {
+      const ipAddress = req.ip;
+      const location: any = await axios.get(`http://ip-api.com/json/${'175.107.239.100'}`);
+
+      if (location && code) {
+        const locationData = {
+          city: location?.city,
+          country: location?.country,
+          ip_address: ipAddress,
+          lat: location?.lat,
+          long: location?.lon,
+        };
+        code.invalid_attempts?.push(locationData);
+      }
+
       code.scan_attempts = code.scan_attempts + 1;
       await code.save();
 

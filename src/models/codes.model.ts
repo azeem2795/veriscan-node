@@ -26,6 +26,15 @@ const codeSchema = new Schema(
       type: Number,
       default: 0,
     },
+    invalid_attempts: [
+      {
+        ip_address: String,
+        lat: String,
+        long: String,
+        city: String,
+        country: String,
+      },
+    ],
     brand: {
       type: Schema.Types.ObjectId,
       ref: 'User',
