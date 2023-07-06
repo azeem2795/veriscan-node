@@ -87,3 +87,32 @@ export const sendInvitationEmail = async (
     });
   });
 };
+
+/**
+ * send invitation email
+ * @param {string} email
+ * @param {string} token
+ * @return {void}
+ */
+export const sendOtpCodeEmail = async (email: string, code: number): Promise<object> => {
+  return await new Promise((resolve, reject) => {
+    // Send email options
+    const mailOptions = {
+      from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
+      to: email,
+      subject: 'Two factor verification',
+      text: `Your verification code is  \n \n ${code} \n \n Please enter it to login.`,
+    };
+
+    // Sending email
+    transporter.sendMail(mailOptions, function (error) {
+      if (error) {
+        // Error
+        reject(error);
+      } else {
+        // Success
+        resolve({ success: true, message: 'Email sent successfully' });
+      }
+    });
+  });
+};

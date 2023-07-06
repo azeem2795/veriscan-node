@@ -80,6 +80,10 @@ const userSchema = new Schema(
       required: true,
       default: NODE_ENV !== 'prod',
     },
+    code: {
+      type: Number,
+      select: false,
+    },
   },
   {
     timestamps: true,
