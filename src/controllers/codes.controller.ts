@@ -3,9 +3,9 @@
  * @author Yousuf Kalim
  */
 import { Response } from 'express';
-import axios from 'axios';
 import Codes from '@models/codes.model';
 import IRequest from '@interfaces/request.interface';
+import { getLocationByIP } from '@/utils/common';
 
 /**
  * Get codes
@@ -109,6 +109,7 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
   const { codeId, brandId } = req.body;
   try {
     const code = await Codes.findOne({ code: codeId, brand: brandId });
+    const ipAddress = req.ip;
 
     if (!code || code.status === 'invalidated') {
       return res
@@ -119,19 +120,9 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     console.log('Learn git task scenario');
 
     if (code.status === 'validated') {
-      const ipAddress = req.ip;
-      const location: any = await axios.get(`http://ip-api.com/json/${ipAddress}`);
-
-      if (location?.data && code) {
-        const { data } = location;
-        const locationData = {
-          city: data?.city,
-          country: data?.country,
-          ip_address: ipAddress,
-          lat: data?.lat,
-          long: data?.lon,
-        };
-        code.invalid_attempts?.push(locationData);
+      const location = await getLocationByIP(ipAddress);
+      if (location) {
+        code.invalid_attempts?.push(location);
       }
 
       code.scan_attempts = code.scan_attempts + 1;
@@ -146,10 +137,14 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     }
 
     code.status = 'validated';
-    code.ip_address = req.ip;
+    code.ip_address = ipAddress;
     code.user_agent = req.get('User-Agent');
     code.validation_time = new Date();
     code.scan_attempts = code.scan_attempts + 1;
+    const location = await getLocationByIP(ipAddress);
+    if (location) {
+      code.valid_attempt_location = location;
+    }
     await code.save();
 
     return res.json({ success: true, status: 'valid', message: 'This product is valid.' });
