@@ -423,7 +423,7 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
 };
 export const updateBrandDescription = async (req: IRequest, res: Response): Promise<Response> => {
   // eslint-disable-next-line
-  const body: any = req.body;
+  // const body: any = req.body;
 
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
@@ -434,20 +434,20 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
         .json({ success: true, message: 'You are not authorized to get this resource' });
     }
     // eslint-disable-next-line
-    const existingUser: any = await Users.findById(userId); // Fetching the existing user
+    // const existingUser: any = await Users.findById(userId); // Fetching the existing user
 
-    if (existingUser?.textTypography) {
-      if (body.textTypography.Body) {
-        existingUser.textTypography.Body = body.textTypography.Body;
-      } else if (body?.textTypography.Paragraph) {
-        existingUser.textTypography.Paragraph = body.textTypography.Paragraph;
-      } else {
-        existingUser.textTypography.Heading = body.textTypography.Heading;
-      }
-      await Users.findByIdAndUpdate(userId, existingUser, { new: true }); // Updating the user
-    } else {
-      await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
-    }
+    // if (existingUser?.textTypography) {
+    //   if (body.textTypography.Body) {
+    //     existingUser.textTypography.Body = body.textTypography.Body;
+    //   } else if (body?.textTypography.Paragraph) {
+    //     existingUser.textTypography.Paragraph = body.textTypography.Paragraph;
+    //   } else {
+    //     existingUser.textTypography.Heading = body.textTypography.Heading;
+    //   }
+    //   await Users.findByIdAndUpdate(userId, existingUser, { new: true }); // Updating the user
+    // } else {
+    //   await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
+    // }
 
     return res.json({ success: true }); // Success
   } catch (err) {
