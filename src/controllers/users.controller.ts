@@ -52,7 +52,6 @@ export const createAdmin = async (req: Request, res: Response): Promise<Response
  */
 export const createBrand = async (req: Request, res: Response): Promise<Response> => {
   const body: User = req.body;
-  console.log('body', body);
 
   if (body.preferences) {
     body.preferences = JSON.parse(body.preferences as string);
@@ -242,7 +241,6 @@ export const getStats = async (req: IRequest, res: Response): Promise<Response> 
         const createdAt = new Date(item.validation_time as string);
         return createdAt > sixMonthsAgo && createdAt <= now;
       });
-
       const stats: Record<string, number> = filteredData.reduce((result, item) => {
         const createdAt = new Date(item.validation_time as string);
         const month = createdAt.toLocaleString('default', { month: 'short' });
@@ -422,7 +420,6 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
         .json({ success: true, message: 'You are not authorized to get this resource' });
     }
 
-    console.log('body', body);
     await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
     return res.json({ success: true }); // Success
   } catch (err) {
@@ -433,7 +430,7 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
   }
 };
 export const updateBrandBackground = async (req: IRequest, res: Response): Promise<Response> => {
-  // eslint-disable-next-line quote-props
+  // eslint-disable-next-line
   const body: any = req.body;
   const data = {
     img: '',
@@ -475,7 +472,6 @@ export const updateBrandBackground = async (req: IRequest, res: Response): Promi
       data.selectedImg = '';
       data.color = '';
     } else if (body.type === 'default') {
-      console.log('defult clg', body.type);
       data.type = body.type;
     } else {
       data.img = '';
@@ -483,8 +479,6 @@ export const updateBrandBackground = async (req: IRequest, res: Response): Promi
       data.selectedImg = body.selectedImg;
       data.color = '';
     }
-
-    console.log('data for update ', data);
 
     await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
     return res.json({ success: true }); // Success
@@ -504,8 +498,7 @@ export const updateFavIcon = async (req: IRequest, res: Response): Promise<Respo
         .status(401)
         .json({ success: true, message: 'You are not authorized to get this resource' });
     }
-    console.log('req.file.path', req.file?.path);
-    console.log('req.body', req.body);
+
     if (req.file?.path) {
       await Users.findByIdAndUpdate(
         userId,
@@ -535,13 +528,11 @@ export const updateFavIcon = async (req: IRequest, res: Response): Promise<Respo
   }
 };
 export const socialMediaUpdate = async (req: IRequest, res: Response): Promise<Response> => {
-  // eslint-disable-next-line quote-props
+  // eslint-disable-next-line
   const body: any = req.body;
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
 
-    console.log('userId', userId);
-    console.log('body', body);
     if (req.user?.role === 'brand' && userId !== req.user._id) {
       return res
         .status(401)
@@ -580,13 +571,10 @@ export const socialMediaUpdate = async (req: IRequest, res: Response): Promise<R
 };
 
 export const customeBtnUpdate = async (req: IRequest, res: Response): Promise<Response> => {
-  // eslint-disable-next-line quote-props
+  // eslint-disable-next-line
   const body: any = req.body;
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
-
-    console.log('userId', userId);
-    console.log('body', body);
     if (req.user?.role === 'brand' && userId !== req.user._id) {
       return res
         .status(401)
@@ -608,8 +596,6 @@ export const deleteSocialMedia = async (req: IRequest, res: Response): Promise<R
     const userId = req.params.userId; // Getting user id from URL parameter
     const platformId = req.params.platformId; // Getting user id from URL parameter
 
-    console.log('userId', userId);
-    console.log('platformId', platformId);
     if (req.user?.role === 'brand' && userId !== req.user._id) {
       return res
         .status(401)
