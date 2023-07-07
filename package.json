@@ -20,6 +20,7 @@
   },
   "homepage": "https://github.com/yousufkalim/node-ts-boilerplate#readme",
   "dependencies": {
+    "axios": "^1.4.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
@@ -33,6 +34,7 @@
     "node-cron": "^3.0.2",
     "nodemailer": "^6.8.0",
     "nodemon": "^2.0.22",
+    "otp-generator": "^4.0.1",
     "request": "^2.88.2"
   },
   "devDependencies": {
@@ -48,6 +50,7 @@
     "@types/node": "^18.11.18",
     "@types/node-cron": "^3.0.7",
     "@types/nodemailer": "^6.4.7",
+    "@types/otp-generator": "^4.0.0",
     "@types/request": "^2.48.8",
     "@typescript-eslint/eslint-plugin": "^5.48.2",
     "commitlint-config-non-conventional": "^1.0.1",

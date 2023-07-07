@@ -16,6 +16,7 @@ export default interface User {
   _id: string;
   name: string;
   email: string;
+  code?: number;
   password?: string;
   role: 'admin' | 'brand';
   logo?: string;

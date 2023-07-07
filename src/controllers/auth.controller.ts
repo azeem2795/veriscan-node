@@ -3,13 +3,15 @@
  * @author Yousuf Kalim
  */
 import { Request, Response } from 'express';
+import otpGenerator from 'otp-generator';
 import IRequest from '@interfaces/request.interface';
 import Auth, { ChangePassword } from '@interfaces/auth.interface';
 import Users from '@models/users.model';
 import bcrypt from 'bcryptjs';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { sendForgotEmail } from '@utils/sendEmail';
+import { sendForgotEmail, sendOtpCodeEmail } from '@utils/sendEmail';
 import { BCRYPT_SALT, JWT_SECRET, ADMIN, CLIENT } from '@config';
+
 
 /**
  * Login
@@ -24,7 +26,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     const { email, password } = body;
 
     // Getting user from db
-    const user = await Users.findOne({ email });
+    const user = await Users.findOne({ email }).select('+code');
 
     if (!user) {
       // If user not found
@@ -44,14 +46,29 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       return res.status(400).json({ success: false, message: 'Invalid Password' });
     }
 
-    // Creating payload with user object
-    delete user.password; // Removing password from user object
-    const payload = { user };
+    const otp = await otpGenerator.generate(6, {
+      digits: true,
+      lowerCaseAlphabets: false,
+      upperCaseAlphabets: false,
+      specialChars: false,
+    });
 
-    // Generating token
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+    const code = parseInt(otp);
+    await sendOtpCodeEmail(email, code);
+    user.code = code;
 
-    return res.json({ success: true, user, token });
+    await user.save();
+
+    return res.status(200).json({
+      success: true,
+      message: 'Verification code has been sent to your email. Please check your email',
+    });
+    // // Creating payload with user object
+    // delete user.password; // Removing password from user object
+    // const payload = { user };
+
+    // // Generating token
+    // const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
@@ -159,6 +176,42 @@ export const verifyToken = async (req: Request, res: Response): Promise<Response
       message: 'Token verified successfully',
       userId: user._id,
     });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+/**
+ * Verify token
+ * @param {object} req
+ * @param {object} res
+ */
+export const verifyCode = async (req: Request, res: Response): Promise<Response> => {
+  try {
+    const { email, code } = req.body;
+
+    const user = await Users.findOne({ email }).select('+code');
+
+    if (!user) {
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
+
+    if (user.code !== code) {
+      return res.status(400).json({ success: false, message: 'Invalid code' });
+    }
+
+    // Creating payload with user object
+    delete user.password; // Removing password from user object
+    delete user.code; // Removing password from user object
+    const payload = { user };
+
+    // Generating token
+    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
+    return res.json({ success: true, user, token });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console

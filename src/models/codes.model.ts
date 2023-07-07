@@ -20,12 +20,32 @@ const codeSchema = new Schema(
       required: true,
     },
     ip_address: String,
+    valid_attempt_location: {
+      ip_address: String,
+      lat: String,
+      long: String,
+      city: String,
+      country: String,
+    },
     user_agent: String,
     validation_time: Date,
     scan_attempts: {
       type: Number,
       default: 0,
     },
+    invalid_attempts: [
+      {
+        ip_address: String,
+        lat: String,
+        long: String,
+        city: String,
+        country: String,
+        timestamp: {
+          type: Date,
+          default: new Date(),
+        },
+      },
+    ],
     brand: {
       type: Schema.Types.ObjectId,
       ref: 'User',
