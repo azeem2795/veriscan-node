@@ -10,6 +10,7 @@ import {
   resetPassword,
   forgot,
   verifyToken,
+  verifyCode,
 } from '@controllers/auth.controller';
 import { checkUserAuth } from '@middleware/auth.middleware';
 import {
@@ -31,6 +32,7 @@ const router = Router();
 
 // Read
 router.post('/login', validateLogin, isValidated, login); // Get all users at once
+router.post('/verify-code', verifyCode); // Verify Two factor authentication
 
 router.get('/', checkUserAuth, confirmAuth); // Check user auth
 router.get('/verify-token/:token', verifyToken); // Verify user token

@@ -4,6 +4,23 @@
  */
 import User from './users.interface';
 
+export interface InvalidAttempts {
+  ip_address: string;
+  lat: string;
+  long: string;
+  city: string;
+  country: string;
+  timestamp?: Date;
+}
+
+export interface IValidAttemptLocation {
+  ip_address: string;
+  lat: string;
+  long: string;
+  city: string;
+  country: string;
+}
+
 export default interface Code {
   _id: string;
   code: string;
@@ -12,6 +29,8 @@ export default interface Code {
   user_agent?: string;
   validation_time?: string | Date | number;
   scan_attempts: number;
+  invalid_attempts?: InvalidAttempts[];
+  valid_attempt_location?: IValidAttemptLocation;
   brand: string | User;
   request: string;
   request_name: string;
