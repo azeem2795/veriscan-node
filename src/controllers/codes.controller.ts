@@ -119,7 +119,7 @@ export const getUserLocations = async (req: IRequest, res: Response): Promise<Re
  * @param {object} req
  * @param {object} res
  */
-export const getAllLocations = async (req: IRequest, res: Response): Promise<Response> => {
+export const getAllLocations = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
     const codes: ICode[] = await Codes.find({ scan_attempts: { $gte: 0 } });
     const invalidAttempts = codes?.map((item) =>
