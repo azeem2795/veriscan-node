@@ -285,22 +285,31 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
     const brandurl = `/${url}`;
 
     // const brand = await Users.findOne({ url: { $regex: brandurl, $options: 'i' } });
-    const brand = await Users.findOne({ url: brandurl });
+    // eslint-disable-next-line
+    const brand: any = await Users.findOne({ url: brandurl });
 
     if (!brand) {
       return res.status(404).json({ success: false, message: 'Brand not found' });
     }
-
+    console.log('brand', brand);
+    const brandData = {
+      name: brand.name,
+      id: brand._id,
+      logoWidth: brand.logoWidth ? brand.logoWidth : '',
+      websiteLink: brand.websiteLink ? brand.websiteLink : '',
+      preferences: brand.preferences,
+      logo: brand.logo ? brand.logo : '',
+      textTypography: brand.textTypography ? brand.textTypography : '',
+      background: brand.background ? brand.background : '',
+      socialMedia: brand.socialMedia ? brand.socialMedia : '',
+      customizeButton: brand.customizeButton ? brand.customizeButton : '',
+      description: brand.description ? brand.description : '',
+      favIcon: brand.favIcon ? brand.favIcon : '',
+    };
+    console.log('brandData', brandData);
     return res.json({
       success: true,
-      brand: {
-        name: brand.name,
-        id: brand._id,
-        logoWidth: brand.logoWidth ? brand.logoWidth : '',
-        websiteLink: brand.websiteLink ? brand.websiteLink : '',
-
-        preferences: brand.preferences,
-      },
+      brand: brandData,
     }); // Success
   } catch (err) {
     // Error handling
