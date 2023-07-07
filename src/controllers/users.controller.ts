@@ -423,7 +423,7 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
 };
 export const updateBrandDescription = async (req: IRequest, res: Response): Promise<Response> => {
   // eslint-disable-next-line
-  const body: any = req.body;
+  // const body: any = req.body;
 
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
