@@ -433,7 +433,6 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
         .status(401)
         .json({ success: true, message: 'You are not authorized to get this resource' });
     }
-    console.log('body', body?.textTypography.Body);
     // eslint-disable-next-line
     const existingUser: any = await Users.findById(userId); // Fetching the existing user
 
