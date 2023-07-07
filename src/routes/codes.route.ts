@@ -7,7 +7,9 @@ import { checkUserAuth } from '@middleware/auth.middleware';
 import {
   activateCodes,
   exportCodes,
+  getAllLocations,
   getCodes,
+  getUserLocations,
   invalidateCodes,
   validateCode,
 } from '@controllers/codes.controller';
@@ -25,6 +27,8 @@ const router = Router();
 router.post('/validate', validateCode); // Validate a code
 
 router.get('/', checkUserAuth, getCodes); // get paginated codes
+router.get('/locations/:brandId', checkUserAuth, getUserLocations); // get paginated codes
+router.get('/all-locations', checkUserAuth, getAllLocations); // get paginated codes
 router.get('/export', checkUserAuth, exportCodes); // get all codes to export in csv
 
 router.put('/invalidate', checkUserAuth, validateCodesInvalidate, isValidated, invalidateCodes); // Invalidate the codes
