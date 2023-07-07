@@ -118,7 +118,7 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
 
     const result = new BrandFeedback({
       fileds: feedbacks,
-      brandId,
+      brand: brandId,
     });
     console.log('Data ', result);
     await result.save();
