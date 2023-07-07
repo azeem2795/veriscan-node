@@ -597,7 +597,7 @@ export const socialMediaUpdate = async (req: IRequest, res: Response): Promise<R
 
 export const customeBtnUpdate = async (req: IRequest, res: Response): Promise<Response> => {
   // eslint-disable-next-line
-  const body: any = req.body;
+  // const body: any = req.body;
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
     if (req.user?.role === 'brand' && userId !== req.user._id) {
