@@ -6,6 +6,7 @@ import { Request, Response } from 'express';
 import Users from '@models/users.model';
 import Requests from '@models/requests.model';
 import Codes from '@models/codes.model';
+import FeedbackForm from '@models/feedbackForm';
 import User from '@interfaces/users.interface';
 import bcrypt from 'bcryptjs';
 import { BCRYPT_SALT, JWT_SECRET, CLIENT } from '@config';
@@ -291,7 +292,9 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
     if (!brand) {
       return res.status(404).json({ success: false, message: 'Brand not found' });
     }
-    console.log('brand', brand);
+
+    const feedbackForm = await FeedbackForm.find({ brand: brand._id });
+    console.log('brand', feedbackForm);
     const brandData = {
       name: brand.name,
       id: brand._id,
@@ -310,6 +313,7 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
     return res.json({
       success: true,
       brand: brandData,
+      feedbackForm,
     }); // Success
   } catch (err) {
     // Error handling

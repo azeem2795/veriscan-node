@@ -5,6 +5,7 @@
 import { Response } from 'express';
 import Codes from '@models/codes.model';
 import IRequest from '@interfaces/request.interface';
+import BrandFeedback from '@models/brandFeedback';
 
 /**
  * Get codes
@@ -105,7 +106,7 @@ export const invalidateCodes = async (req: IRequest, res: Response): Promise<Res
  * @param {object} res
  */
 export const validateCode = async (req: IRequest, res: Response): Promise<Response> => {
-  const { codeId, brandId } = req.body;
+  const { codeId, brandId, feedbacks } = req.body;
   try {
     const code = await Codes.findOne({ code: codeId, brand: brandId });
 
@@ -114,6 +115,13 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
         .status(404)
         .json({ success: false, status: 'invalid', message: 'This code is invalid.' });
     }
+
+    const result = new BrandFeedback({
+      fileds: feedbacks,
+      brandId,
+    });
+    console.log('Data ', result);
+    await result.save();
 
     if (code.status === 'validated') {
       code.scan_attempts = code.scan_attempts + 1;

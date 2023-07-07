@@ -11,6 +11,9 @@ const feedbackFormSchema = new Schema(
     label: {
       type: String,
     },
+    value: {
+      type: String,
+    },
     placeholder: String,
     isRequired: Boolean,
     isActive: Boolean,
