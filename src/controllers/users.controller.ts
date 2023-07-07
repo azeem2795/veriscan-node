@@ -418,7 +418,8 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
   }
 };
 export const updateBrandDescription = async (req: IRequest, res: Response): Promise<Response> => {
-  const body: User = req.body;
+  // eslint-disable-next-line
+  const body: any = req.body;
 
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
@@ -428,8 +429,23 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
         .status(401)
         .json({ success: true, message: 'You are not authorized to get this resource' });
     }
+    console.log('body', body?.textTypography.Body);
+    // eslint-disable-next-line
+    const existingUser: any = await Users.findById(userId); // Fetching the existing user
 
-    await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
+    if (existingUser?.textTypography) {
+      if (body.textTypography.Body) {
+        existingUser.textTypography.Body = body.textTypography.Body;
+      } else if (body?.textTypography.Paragraph) {
+        existingUser.textTypography.Paragraph = body.textTypography.Paragraph;
+      } else {
+        existingUser.textTypography.Heading = body.textTypography.Heading;
+      }
+      await Users.findByIdAndUpdate(userId, existingUser, { new: true }); // Updating the user
+    } else {
+      await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
+    }
+
     return res.json({ success: true }); // Success
   } catch (err) {
     // Error handling
