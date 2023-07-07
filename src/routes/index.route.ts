@@ -7,6 +7,7 @@ import userRoutes from './users.route';
 import authRoutes from './auth.route';
 import requestRoutes from './requests.route';
 import codeRoutes from './codes.route';
+import feedbackRoutes from './feedback.route';
 const router = Router();
 
 // Parent Routes
@@ -14,6 +15,7 @@ router.use('/users', userRoutes); // All the user routes
 router.use('/auth', authRoutes); // All the auth routes
 router.use('/requests', requestRoutes); // All the code request routes
 router.use('/codes', codeRoutes); // All code routes
+router.use('/feedbackForm', feedbackRoutes); // All feedbackRoutes
 
 // Export
 export default router;

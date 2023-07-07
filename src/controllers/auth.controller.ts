@@ -12,7 +12,6 @@ import jwt, { JwtPayload } from 'jsonwebtoken';
 import { sendForgotEmail, sendOtpCodeEmail } from '@utils/sendEmail';
 import { BCRYPT_SALT, JWT_SECRET, ADMIN, CLIENT } from '@config';
 
-
 /**
  * Login
  * @param {object} req
