@@ -40,6 +40,10 @@ const codeSchema = new Schema(
         long: String,
         city: String,
         country: String,
+        timestamp: {
+          type: Date,
+          default: new Date(),
+        },
       },
     ],
     brand: {

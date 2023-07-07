@@ -10,6 +10,7 @@ export interface InvalidAttempts {
   long: string;
   city: string;
   country: string;
+  timestamp?: Date;
 }
 
 export interface IValidAttemptLocation {
