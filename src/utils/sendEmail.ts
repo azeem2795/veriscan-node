@@ -96,31 +96,15 @@ export const sendInvitationEmail = async (
  */
 export const sendOtpCodeEmail = async (email: string, code: number, userName: string): Promise<object> => {
   return await new Promise((resolve, reject) => {
-    // Send email options
+    // Email configuration details
     const mailOptions = {
       from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
       to: email,
       subject: `VeriScan - Your Verification Code: ${code}`,
       text: 
-`Dear ${userName},
-
-In response to a sign-in attempt on your VeriScan account, our two-factor authentication process has been initiated and a unique verification code has been generated for you.
-
-─────────────────────────────────
-Verification Code: ${code}
-─────────────────────────────────
-
-Please enter this code into the requested field on the VeriScan platform to proceed with your sign-in.
-
-Please note: This code is solely for your use and should not be shared. VeriScan representatives will never ask for this code outside of this automated process.
-
-If this sign-in attempt was not made by you, or if you encounter any issues or have questions, please contact our support team immediately at support@getveriscan.com.
-
-Thank you you helping us maintain your account's security.
-
-Best regards,
-The VeriScan Team`,
+`Dear ${userName}, \n \n Following a sign-in attempt on your VeriScan account, our two-factor authentication process has been initiated. A unique verification code has been generated for your use. \n \n Verification Code: ${code} \n \n Please enter this code into the appropriate field on the VeriScan platform to continue with your sign-in. \n \n NOTE: This code is solely for your personal use and should not be shared. VeriScan representatives will never ask for this code outside of this automated process. \n \n If this sign-in attempt was not made by you, or if you have any issues or queries, please contact our support team immediately at support@getveriscan.com. \n \n Thank you for helping us to maintain your account's security. \n \n Best regards, \n The VeriScan Team`,
     };
+
 
     // Sending email
     transporter.sendMail(mailOptions, function (error) {
