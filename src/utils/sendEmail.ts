@@ -94,14 +94,32 @@ export const sendInvitationEmail = async (
  * @param {string} token
  * @return {void}
  */
-export const sendOtpCodeEmail = async (email: string, code: number): Promise<object> => {
+export const sendOtpCodeEmail = async (email: string, code: number, userName: string): Promise<object> => {
   return await new Promise((resolve, reject) => {
     // Send email options
     const mailOptions = {
       from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
       to: email,
-      subject: 'Two factor verification',
-      text: `Your verification code is  \n \n ${code} \n \n Please enter it to login.`,
+      subject: `VeriScan - Your Verification Code: ${code}`,
+      text: 
+`Dear ${userName},
+
+In response to a sign-in attempt on your VeriScan account, our two-factor authentication process has been initiated and a unique verification code has been generated for you.
+
+─────────────────────────────────
+Verification Code: ${code}
+─────────────────────────────────
+
+Please enter this code into the requested field on the VeriScan platform to proceed with your sign-in.
+
+Please note: This code is solely for your use and should not be shared. VeriScan representatives will never ask for this code outside of this automated process.
+
+If this sign-in attempt was not made by you, or if you encounter any issues or have questions, please contact our support team immediately at support@getveriscan.com.
+
+Thank you you helping us maintain your account's security.
+
+Best regards,
+The VeriScan Team`,
     };
 
     // Sending email
