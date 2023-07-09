@@ -97,7 +97,6 @@ export const sendInvitationEmail = async (
 export const sendOtpCodeEmail = async (
   email: string,
   code: number,
-  userName: string,
 ): Promise<object> => {
   return await new Promise((resolve, reject) => {
     // Send email options
@@ -105,7 +104,7 @@ export const sendOtpCodeEmail = async (
       from: `${MAILER_DOMAIN} <${MAILER_EMAIL}>`,
       to: email,
       subject: `VeriScan - Your Verification Code: ${code}`,
-      text: `Dear ${userName}, \n \n Following a sign-in attempt on your VeriScan account, our two-factor authentication process has been initiated. A unique verification code has been generated for your use. \n \n Verification Code: ${code} \n \n Please enter this code into the appropriate field on the VeriScan platform to continue with your sign-in. \n \n NOTE: This code is solely for your personal use and should not be shared. VeriScan representatives will never ask for this code outside of this automated process. \n \n If this sign-in attempt was not made by you, or if you have any issues or queries, please contact our support team immediately at support@getveriscan.com. \n \n Thank you for helping us to maintain your account's security. \n \n Best regards, \n The VeriScan Team`,
+      text: `Hello, \n \n Following a sign-in attempt on your VeriScan account, our two-factor authentication process has been initiated. A unique verification code has been generated for your use. \n \n Verification Code: ${code} \n \n Please enter this code into the appropriate field on the VeriScan platform to continue with your sign-in. \n \n NOTE: This code is solely for your personal use and should not be shared. VeriScan representatives will never ask for this code outside of this automated process. \n \n If this sign-in attempt was not made by you, or if you have any issues or queries, please contact our support team immediately at support@getveriscan.com. \n \n Thank you for helping us to maintain your account's security. \n \n Best regards, \n The VeriScan Team`,
     };
 
     // Sending email
