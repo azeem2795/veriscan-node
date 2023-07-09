@@ -53,7 +53,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
     });
 
     const code = parseInt(otp);
-    await sendOtpCodeEmail(email, code, userName);
+    await sendOtpCodeEmail(email, code);
     user.code = code;
 
     await user.save();
