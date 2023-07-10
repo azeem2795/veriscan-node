@@ -20,6 +20,7 @@ import {
   getBrandByName,
   getStats,
   changeStatus,
+  updateBrandAnimations,
 } from '@controllers/users.controller';
 import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
 import { upload, backgroundUpload } from '@middleware/multer.middleware';
@@ -52,7 +53,8 @@ router.get('/:userId', checkUserAuth, getById); // Get one user by id
 router.put('/admin', checkAdminAuth, updateAdmin); // Update an admin
 router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by id
 router.put('/brand/description/:userId', checkUserAuth, updateBrandDescription); // Update a specific brand by id
-router.put(
+router.put('/brand/animation/:userId', checkUserAuth, updateBrandAnimations); // Update a specific brand by id
+router.patch(
   '/brand/bgImg/:userId',
   checkUserAuth,
   backgroundUpload.single('img'),
