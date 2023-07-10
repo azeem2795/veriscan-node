@@ -457,6 +457,54 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
     return res.status(500).json({ success: false, message: 'Internal server error' });
   }
 };
+export const updateBrandAnimations = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line
+  // const body: any = req.body;
+
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    // eslint-disable-next-line
+    // const existingUser: any = await Users.findById(userId); // Fetching the existing user
+
+    const { animation } = req.body;
+    console.log('Anu ', animation);
+    const anim = await Users.findByIdAndUpdate(
+      req.user?._id,
+      { pageAnimation: animation },
+      { new: true },
+    );
+
+    console.log('Animatiokn ', anim);
+
+    return res.json({
+      success: true,
+      message: 'Page animations has been updated successfully',
+    });
+    // if (existingUser?.textTypography) {
+    //   if (body.textTypography.Body) {
+    //     existingUser.textTypography.Body = body.textTypography.Body;
+    //   } else if (body?.textTypography.Paragraph) {
+    //     existingUser.textTypography.Paragraph = body.textTypography.Paragraph;
+    //   } else {
+    //     existingUser.textTypography.Heading = body.textTypography.Heading;
+    //   }
+    //   await Users.findByIdAndUpdate(userId, existingUser, { new: true }); // Updating the user
+    // } else {
+    //   await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
+    // }
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
 export const updateBrandBackground = async (req: IRequest, res: Response): Promise<Response> => {
   // eslint-disable-next-line
   const body: any = req.body;

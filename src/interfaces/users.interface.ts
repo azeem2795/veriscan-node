@@ -25,6 +25,7 @@ export default interface User {
     color?: string;
     secondaryColor?: string;
   };
+  animation?: 'none' | 'movieIn' | 'zoomIn' | 'bottom';
   logoWidth?: number;
   websiteLink?: string;
   url?: string;

@@ -29,6 +29,11 @@ const userSchema = new Schema(
     websiteLink: { type: String },
     url: { type: String },
     logo: { type: String },
+    pageAnimation: {
+      type: String,
+      enum: ['none', 'moveIn', 'zoomIn', 'bottom'],
+      default: 'none',
+    },
     preferences: {
       logo: String,
       color: String,
