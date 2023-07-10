@@ -31,6 +31,7 @@ export default interface Code {
   scan_attempts: number;
   invalid_attempts?: InvalidAttempts[];
   valid_attempt_location?: IValidAttemptLocation;
+  code_type: 'regular' | 'nfc';
   brand: string | User;
   request: string;
   request_name: string;
