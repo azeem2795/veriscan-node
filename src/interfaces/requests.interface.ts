@@ -10,6 +10,8 @@ export default interface CodeRequest {
   number_of_codes: number;
   text?: string;
   brand: string | User;
+  code_type?: 'regular' | 'nfc';
+  nfc?: boolean;
   status: 'pending' | 'approved' | 'rejected' | 'invalidated';
   createdAt: string;
   updatedAt: string;

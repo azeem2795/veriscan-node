@@ -29,6 +29,11 @@ const codeSchema = new Schema(
     },
     user_agent: String,
     validation_time: Date,
+    code_type: {
+      type: String,
+      enum: ['regular', 'nfc'],
+      default: 'regular',
+    },
     scan_attempts: {
       type: Number,
       default: 0,

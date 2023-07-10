@@ -60,7 +60,6 @@ export const getUserLocations = async (req: IRequest, res: Response): Promise<Re
   try {
     const { brandId } = req.params;
     const codes: ICode[] = await Codes.find({ brand: brandId, scan_attempts: { $gte: 0 } });
-    // console.log('Codes ', codes);
     const invalidAttempts = codes?.map((item) =>
       item?.invalid_attempts?.map((a) => {
         const { timestamp, ip_address: ipAddress, lat, long, city, country } = a;
@@ -241,7 +240,7 @@ export const invalidateCodes = async (req: IRequest, res: Response): Promise<Res
  * @param {object} res
  */
 export const validateCode = async (req: IRequest, res: Response): Promise<Response> => {
-  const { codeId, brandId, feedbacks } = req.body;
+  const { codeId, brandId, feedbacks, code_type: codeType } = req.body;
   try {
     const code = await Codes.findOne({ code: codeId, brand: brandId });
     const ipAddress = req.ip;
@@ -251,12 +250,17 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
         .status(404)
         .json({ success: false, status: 'invalid', message: 'This code is invalid.' });
     }
+    if (code?.code_type !== codeType) {
+      return res.status(400).json({
+        success: false,
+        message: 'Code type is invalid',
+      });
+    }
 
     const result = new BrandFeedback({
       fileds: feedbacks,
       brand: brandId,
     });
-    console.log('Data ', result);
     await result.save();
 
     if (code.status === 'validated') {

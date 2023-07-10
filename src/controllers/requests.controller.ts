@@ -18,6 +18,7 @@ import Users from '@models/users.model';
 export const create = async (req: IRequest, res: Response): Promise<Response> => {
   const requestBody: CodeRequest = req.body;
   try {
+    requestBody.code_type = requestBody.nfc ? 'nfc' : 'regular';
     const request = await Requests.create({ ...requestBody, brand: req.user?._id });
 
     return res.json({ success: true, message: 'Request has been created', request });
@@ -108,9 +109,11 @@ export const approveRequest = async (req: IRequest, res: Response): Promise<Resp
       return res.status(404).json({ success: false, message: 'Brand not found' });
     }
 
+    const codeLength = request.code_type === 'nfc' ? 16 : 8;
     const codes: Array<{
       code: string;
       brand: string;
+      code_type?: string;
       brand_name: string;
       request: string;
       request_name: string;
@@ -118,9 +121,10 @@ export const approveRequest = async (req: IRequest, res: Response): Promise<Resp
 
     for (let i = 0; i < request.number_of_codes; i++) {
       codes.push({
-        code: uid(),
+        code: uid(codeLength),
         brand: brand.id,
         brand_name: brand.name,
+        code_type: request.code_type,
         request: request._id,
         request_name: request.name,
       });

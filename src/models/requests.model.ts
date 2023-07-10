@@ -22,6 +22,11 @@ const requestSchema = new Schema(
       ref: 'User',
       required: true,
     },
+    code_type: {
+      type: String,
+      enum: ['regular', 'nfc'],
+      default: 'regular',
+    },
     status: {
       type: String,
       enum: ['pending', 'approved', 'rejected', 'invalidated'],
