@@ -308,6 +308,7 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       customizeButton: brand.customizeButton ? brand.customizeButton : '',
       description: brand.description ? brand.description : '',
       favIcon: brand.favIcon ? brand.favIcon : '',
+      pageAnimation: brand.pageAnimation,
     };
     console.log('brandData', brandData);
     return res.json({
