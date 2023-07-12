@@ -80,6 +80,11 @@ const userSchema = new Schema(
       color: String,
     },
     description: { type: String },
+    layout: {
+      type: String,
+      enum: ['1', '2', '3', '4'],
+      default: '1',
+    },
     active: {
       type: Boolean,
       required: true,

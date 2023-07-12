@@ -21,10 +21,16 @@ import {
   getStats,
   changeStatus,
   updateBrandAnimations,
+  updateBrandLayouts,
 } from '@controllers/users.controller';
 import { checkAdminAuth, checkUserAuth } from '@middleware/auth.middleware';
 import { upload, backgroundUpload } from '@middleware/multer.middleware';
-import { validateAdmin, validateBrand, isValidated } from '@middleware/validations.middleware';
+import {
+  validateAdmin,
+  validateBrand,
+  isValidated,
+  validateLayout,
+} from '@middleware/validations.middleware';
 const router = Router();
 
 /**
@@ -54,7 +60,8 @@ router.put('/admin', checkAdminAuth, updateAdmin); // Update an admin
 router.put('/brand/:userId', checkUserAuth, upload.single('logo'), updateBrand); // Update a specific brand by id
 router.put('/brand/description/:userId', checkUserAuth, updateBrandDescription); // Update a specific brand by id
 router.put('/brand/animation/:userId', checkUserAuth, updateBrandAnimations); // Update a specific brand by id
-router.patch(
+router.put('/brand/layout/:userId', checkUserAuth, validateLayout, isValidated, updateBrandLayouts); // Update a specific brand by id
+router.put(
   '/brand/bgImg/:userId',
   checkUserAuth,
   backgroundUpload.single('img'),
