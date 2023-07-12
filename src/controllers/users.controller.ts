@@ -294,6 +294,7 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
     }
 
     const feedbackForm = await FeedbackForm.find({ brand: brand._id });
+    const layout = brand?.layout ? brand?.layout : '1';
     console.log('brand', feedbackForm);
     const brandData = {
       name: brand.name,
@@ -315,6 +316,7 @@ export const getBrandByName = async (req: IRequest, res: Response): Promise<Resp
       success: true,
       brand: brandData,
       feedbackForm,
+      layout,
     }); // Success
   } catch (err) {
     // Error handling
@@ -424,7 +426,7 @@ export const updateBrand = async (req: IRequest, res: Response): Promise<Respons
 };
 export const updateBrandDescription = async (req: IRequest, res: Response): Promise<Response> => {
   // eslint-disable-next-line
-  // const body: any = req.body;
+  const body: any = req.body;
 
   try {
     const userId = req.params.userId; // Getting user id from URL parameter
@@ -434,6 +436,7 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
         .status(401)
         .json({ success: true, message: 'You are not authorized to get this resource' });
     }
+    console.log('body', body);
     // eslint-disable-next-line
     // const existingUser: any = await Users.findById(userId); // Fetching the existing user
 
@@ -449,6 +452,7 @@ export const updateBrandDescription = async (req: IRequest, res: Response): Prom
     // } else {
     //   await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
     // }
+    await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
 
     return res.json({ success: true }); // Success
   } catch (err) {
@@ -487,18 +491,35 @@ export const updateBrandAnimations = async (req: IRequest, res: Response): Promi
       success: true,
       message: 'Page animations has been updated successfully',
     });
-    // if (existingUser?.textTypography) {
-    //   if (body.textTypography.Body) {
-    //     existingUser.textTypography.Body = body.textTypography.Body;
-    //   } else if (body?.textTypography.Paragraph) {
-    //     existingUser.textTypography.Paragraph = body.textTypography.Paragraph;
-    //   } else {
-    //     existingUser.textTypography.Heading = body.textTypography.Heading;
-    //   }
-    //   await Users.findByIdAndUpdate(userId, existingUser, { new: true }); // Updating the user
-    // } else {
-    //   await Users.findByIdAndUpdate(userId, body, { new: true }); // Updating the user
-    // }
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+
+export const updateBrandLayouts = async (req: IRequest, res: Response): Promise<Response> => {
+  // eslint-disable-next-line
+
+  try {
+    const userId = req.params.userId; // Getting user id from URL parameter
+    if (req.user?.role === 'brand' && userId !== req.user._id) {
+      return res
+        .status(401)
+        .json({ success: true, message: 'You are not authorized to get this resource' });
+    }
+    // eslint-disable-next-line
+
+    const { layout } = req.body;
+    console.log('layout', layout);
+    await Users.findByIdAndUpdate(req.user?._id, { layout }, { new: true });
+    // console.log('layoutDesign ', layoutDesign);
+
+    return res.json({
+      success: true,
+      message: 'Layout updated successfully',
+    });
   } catch (err) {
     // Error handling
     // eslint-disable-next-line no-console
@@ -556,6 +577,7 @@ export const updateBrandBackground = async (req: IRequest, res: Response): Promi
       data.selectedImg = body.selectedImg;
       data.color = '';
     }
+    console.log('data', data);
 
     await Users.findByIdAndUpdate(userId, { background: data }, { new: true }); // Updating the user
     return res.json({ success: true }); // Success

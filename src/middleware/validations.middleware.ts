@@ -47,6 +47,16 @@ export const changePasswordValidate = [
   check('confirmPassword', 'Confirm password is required.').notEmpty().trim().isLength({ min: 8 }),
 ];
 
+// Layout validation
+export const validateLayout = [
+  check('layout').custom((value) => {
+    if (!['1', '2', '3', '4'].includes(value)) {
+      throw new Error('Invalid Layout Value');
+    }
+    return true;
+  }),
+];
+
 /*
 ======================
 Result

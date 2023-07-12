@@ -34,6 +34,7 @@ export default interface User {
   socialMedia?: [];
   customizeButton?: customizeButton;
   description?: string;
+  layout: string;
   active: boolean;
   createdAt: string;
   updatedAt: string;
