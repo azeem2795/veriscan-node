@@ -53,7 +53,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     if: ${{ contains('["yousufkalim", "Zunairaali482"]', github.actor) || github.event_name == 'push' || github.event.inputs.environment == 'dev' }}
 
     steps:
