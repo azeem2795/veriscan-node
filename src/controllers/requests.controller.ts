@@ -109,7 +109,7 @@ export const approveRequest = async (req: IRequest, res: Response): Promise<Resp
       return res.status(404).json({ success: false, message: 'Brand not found' });
     }
 
-    const codeLength = request.code_type === 'nfc' ? 16 : 8;
+    const codeLength = request.code_type === 'nfc' ? 16 : 10;
     const codes: Array<{
       code: string;
       brand: string;
