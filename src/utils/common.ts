@@ -6,6 +6,8 @@ interface IReturnLocation {
   ip_address: string;
   lat: string;
   long: string;
+  zip: string;
+  region: string;
 }
 
 export const getLocationByIP = async (ip: string): Promise<IReturnLocation | undefined> => {
@@ -20,6 +22,8 @@ export const getLocationByIP = async (ip: string): Promise<IReturnLocation | und
       ip_address: ipAddress,
       lat: data?.lat,
       long: data?.lon,
+      zip: data?.zip,
+      region: data?.region,
     };
 
     return locationData;
