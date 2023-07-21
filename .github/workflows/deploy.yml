@@ -54,7 +54,7 @@ on:
 jobs:
   deploy:
     runs-on: self-hosted
-    if: ${{ contains('["yousufkalim", "Zunairaali482"]', github.actor) || github.event_name == 'push' || github.event.inputs.environment == 'dev' }}
+    if: ${{ contains('["yousufkalim", "Zunairaali482", "connor-vpw"]', github.actor) || github.event_name == 'push' || github.event.inputs.environment == 'dev' }}
 
     steps:
       # The first step checks out the code from the repository.
