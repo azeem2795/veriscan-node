@@ -129,7 +129,7 @@ export const getAllLocations = async (_req: IRequest, res: Response): Promise<Re
     const codes: ICode[] = await Codes.find({ scan_attempts: { $gte: 0 } });
     const invalidAttempts = codes?.map((item) =>
       item?.repeated_attempts?.map((a) => {
-        const { timestamp, ip_address: ipAddress, lat, long, city, country } = a;
+        const { timestamp, ip_address: ipAddress, lat, long, city, country, zip, region } = a;
         return {
           code: item.code,
           batch: item.request_name,
@@ -139,6 +139,8 @@ export const getAllLocations = async (_req: IRequest, res: Response): Promise<Re
           long,
           city,
           country,
+          zip,
+          region,
         };
       }),
     );
