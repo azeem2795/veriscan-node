@@ -44,6 +44,63 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       // If password not matched
       return res.status(400).json({ success: false, message: 'Invalid Password' });
     }
+    if (req.body.twoFactor as boolean) {
+      // Creating payload with user object
+      delete user.password; // Removing password from user object
+      delete user.code; // Removing password from user object
+      const payload = { user };
+
+      // Generating token
+      const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+
+      return res.json({ success: true, user, token });
+    } else {
+      const otp = await otpGenerator.generate(6, {
+        digits: true,
+        lowerCaseAlphabets: false,
+        upperCaseAlphabets: false,
+        specialChars: false,
+      });
+
+      const code = parseInt(otp);
+      await sendOtpCodeEmail(email, code);
+      user.code = code;
+
+      await user.save();
+
+      return res.status(200).json({
+        success: true,
+        message: 'Verification code has been sent to your email. Please check your email',
+      });
+    }
+
+    // // Creating payload with user object
+    // delete user.password; // Removing password from user object
+    // const payload = { user };
+
+    // // Generating token
+    // const token = jwt.sign(payload, JWT_SECRET, { expiresIn: '8h' });
+  } catch (err) {
+    // Error handling
+    // eslint-disable-next-line no-console
+    console.log('Error ----> ', err);
+    return res.status(500).json({ success: false, message: 'Internal server error' });
+  }
+};
+export const resendCode = async (req: Request, res: Response): Promise<Response> => {
+  const body: Auth = req.body;
+
+  try {
+    // Getting email and password
+    const { email } = body;
+
+    // Getting user from db
+    const user = await Users.findOne({ email }).select('+code');
+
+    if (!user) {
+      // If user not found
+      return res.status(404).json({ success: false, message: 'User not found' });
+    }
 
     const otp = await otpGenerator.generate(6, {
       digits: true,
@@ -62,6 +119,7 @@ export const login = async (req: Request, res: Response): Promise<Response> => {
       success: true,
       message: 'Verification code has been sent to your email. Please check your email',
     });
+
     // // Creating payload with user object
     // delete user.password; // Removing password from user object
     // const payload = { user };
@@ -173,7 +231,7 @@ export const verifyToken = async (req: Request, res: Response): Promise<Response
     return res.status(200).json({
       success: true,
       message: 'Token verified successfully',
-      userId: user._id,
+      userId: user,
     });
   } catch (err) {
     // Error handling
@@ -197,9 +255,22 @@ export const verifyCode = async (req: Request, res: Response): Promise<Response>
     if (!user) {
       return res.status(404).json({ success: false, message: 'User not found' });
     }
-
     if (user.code !== code) {
       return res.status(400).json({ success: false, message: 'Invalid code' });
+    }
+
+    const isOTPValid = (updatedAt: string): boolean => {
+      const currentTime: Date = new Date();
+      const updatedAtTime: Date = new Date(updatedAt);
+      const timeDifference: number = currentTime.getTime() - updatedAtTime.getTime();
+      return timeDifference <= 600000;
+    };
+
+    if (!isOTPValid(user.updatedAt)) {
+      console.log('aaaaa');
+      return res
+        .status(400)
+        .json({ success: false, message: 'Your OTP has been expired, please resend.' });
     }
 
     // Creating payload with user object
