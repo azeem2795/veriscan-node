@@ -4,6 +4,7 @@
  */
 import { Response } from 'express';
 import Codes from '@models/codes.model';
+import InvalidAttempts from '@models/invalidAttempts.model';
 import IRequest from '@interfaces/request.interface';
 
 import BrandFeedback from '@models/brandFeedback';
@@ -61,8 +62,8 @@ export const getUserLocations = async (req: IRequest, res: Response): Promise<Re
     const { brandId } = req.params;
     const codes: ICode[] = await Codes.find({ brand: brandId, scan_attempts: { $gte: 0 } });
     const invalidAttempts = codes?.map((item) =>
-      item?.invalid_attempts?.map((a) => {
-        const { timestamp, ip_address: ipAddress, lat, long, city, country } = a;
+      item?.repeated_attempts?.map((a) => {
+        const { timestamp, ip_address: ipAddress, lat, long, city, country, zip, region } = a;
         return {
           code: item.code,
           batch: item.request_name,
@@ -72,6 +73,8 @@ export const getUserLocations = async (req: IRequest, res: Response): Promise<Re
           long,
           city,
           country,
+          zip,
+          region,
         };
       }),
     );
@@ -125,7 +128,7 @@ export const getAllLocations = async (_req: IRequest, res: Response): Promise<Re
   try {
     const codes: ICode[] = await Codes.find({ scan_attempts: { $gte: 0 } });
     const invalidAttempts = codes?.map((item) =>
-      item?.invalid_attempts?.map((a) => {
+      item?.repeated_attempts?.map((a) => {
         const { timestamp, ip_address: ipAddress, lat, long, city, country } = a;
         return {
           code: item.code,
@@ -245,6 +248,51 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     const code = await Codes.findOne({ code: codeId, brand: brandId });
     const ipAddress = req.ip;
 
+    if (!code) {
+      const location = await getLocationByIP(ipAddress);
+      const isExist: any = await InvalidAttempts.findOne({
+        $or: [
+          {
+            code: codeId,
+          },
+          {
+            location: {
+              ipAddress,
+            },
+          },
+        ],
+      });
+
+      if (isExist) {
+        const currentDate = new Date();
+        const currentTime = currentDate.getTime() / 60000;
+        const createdTime = new Date(isExist.createdAt).getTime() / 60000;
+
+        const expiryTime = 60;
+        const anHourSpend = currentTime - createdTime > expiryTime;
+
+        if (anHourSpend) {
+          await InvalidAttempts.create({
+            location,
+            code: codeId,
+            user_agent: req.get('User-Agent'),
+          });
+        } else {
+          console.log('Not Spend hour *******');
+        }
+        // console.log('Current Date 88888888 ', currentDate);
+        // const difference = currentDate.diff(createdAt, 'minutes', true);
+        // const difference = moment.duration(currentDate.diff(createdAt));
+        // console.log('Difference ', difference);
+      } else {
+        await InvalidAttempts.create({
+          location,
+          code: codeId,
+          user_agent: req.get('User-Agent'),
+        });
+      }
+    }
+
     if (!code || code.status === 'invalidated') {
       return res
         .status(404)
@@ -266,11 +314,11 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     if (code.status === 'validated') {
       const location = await getLocationByIP(ipAddress);
       if (location) {
-        const ifExist = code?.invalid_attempts?.find(
+        const ifExist = code?.repeated_attempts?.find(
           (item) => item.lat === location?.lat && item.long === location.long,
         );
         if (!ifExist) {
-          code.invalid_attempts?.push(location);
+          code.repeated_attempts?.push(location);
         }
       }
 

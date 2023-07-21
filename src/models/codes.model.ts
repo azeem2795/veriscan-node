@@ -26,6 +26,8 @@ const codeSchema = new Schema(
       long: String,
       city: String,
       country: String,
+      region: String,
+      zip: String,
     },
     user_agent: String,
     validation_time: Date,
@@ -38,13 +40,15 @@ const codeSchema = new Schema(
       type: Number,
       default: 0,
     },
-    invalid_attempts: [
+    repeated_attempts: [
       {
         ip_address: String,
         lat: String,
         long: String,
         city: String,
         country: String,
+        region: String,
+        zip: String,
         timestamp: {
           type: Date,
           default: new Date(),

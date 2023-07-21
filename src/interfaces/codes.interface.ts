@@ -4,12 +4,14 @@
  */
 import User from './users.interface';
 
-export interface InvalidAttempts {
+export interface IRepeatedAttempts {
   ip_address: string;
   lat: string;
   long: string;
   city: string;
   country: string;
+  zip: string;
+  region: string;
   timestamp?: Date;
 }
 
@@ -29,7 +31,7 @@ export default interface Code {
   user_agent?: string;
   validation_time?: string | Date | number;
   scan_attempts: number;
-  invalid_attempts?: InvalidAttempts[];
+  repeated_attempts?: IRepeatedAttempts[];
   valid_attempt_location?: IValidAttemptLocation;
   code_type: 'regular' | 'nfc';
   brand: string | User;
