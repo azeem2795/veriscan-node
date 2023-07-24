@@ -60,7 +60,7 @@ export const getCodes = async (req: IRequest, res: Response): Promise<Response> 
 export const getUserLocations = async (req: IRequest, res: Response): Promise<Response> => {
   try {
     const { brandId } = req.params;
-    const codes: ICode[] = await Codes.find({ brand: brandId, scan_attempts: { $gte: 0 } });
+    const codes: ICode[] = await Codes.find({ brand: brandId, scan_attempts: { $gt: 0 } });
     const invalidAttempts = codes?.map((item) =>
       item?.repeated_attempts?.map((a) => {
         const { timestamp, ip_address: ipAddress, lat, long, city, country, zip, region } = a;
@@ -78,7 +78,9 @@ export const getUserLocations = async (req: IRequest, res: Response): Promise<Re
         };
       }),
     );
+    console.log('invalidAttempts', invalidAttempts);
     const locations = invalidAttempts.flat();
+    console.log('locations', locations);
 
     // Get valid locations
     const validData = [];
@@ -126,8 +128,14 @@ export const getUserLocations = async (req: IRequest, res: Response): Promise<Re
  */
 export const getAllLocations = async (_req: IRequest, res: Response): Promise<Response> => {
   try {
-    const codes: ICode[] = await Codes.find({ scan_attempts: { $gte: 0 } });
-    const invalidAttempts = codes?.map((item) =>
+    console.log('0');
+    // await Codes.collection.createIndex({ scan_attempts: 1 }, { background: true });
+    // const query = Codes.find({ scan_attempts: { $gt: 0 } });
+    // const executionDetails = await query.explain('executionStats').exec();
+
+    const codes: ICode[] = await Codes.find({ scan_attempts: { $gt: 0 } });
+    console.log('1', codes);
+    const repeatedAttempts = codes?.map((item) =>
       item?.repeated_attempts?.map((a) => {
         const { timestamp, ip_address: ipAddress, lat, long, city, country, zip, region } = a;
         return {
@@ -144,7 +152,7 @@ export const getAllLocations = async (_req: IRequest, res: Response): Promise<Re
         };
       }),
     );
-    const locations = invalidAttempts.flat();
+    const locations = repeatedAttempts.flat();
 
     // Get valid locations
     const validData = [];
@@ -159,14 +167,31 @@ export const getAllLocations = async (_req: IRequest, res: Response): Promise<Re
         });
       }
     }
-    const invalidLocations = locations?.map((item) => ({
+    const invalidAttempt = await InvalidAttempts.find();
+
+    const invalidLocations = invalidAttempt?.map((item: any) => ({
+      code: item?.code,
+      timestamp: item?.updatedAt,
+      ipAddress: item?.location?.ip_address,
+      lat: item?.location?.lat,
+      long: item?.location?.long,
+      city: item?.location?.city,
+      country: item?.location?.country,
+      zip: item?.location?.zip,
+      region: item?.location?.region,
+      name: item?.location.city,
+      latLng: [item?.location?.lat, item?.location?.long],
+      color: '#FF0000',
+      status: 'invalid_attempt',
+    }));
+
+    const repeatedLocations = locations?.map((item) => ({
       ...item,
       name: item?.city,
       latLng: [item?.lat, item?.long],
-      color: '#ff0000',
-      status: 'invalid',
+      color: '#FFA500',
+      status: 'repeated',
     }));
-
     const validLocations = validData?.map((item) => ({
       ...item,
       latLng: [item?.lat, item?.long],
@@ -176,7 +201,7 @@ export const getAllLocations = async (_req: IRequest, res: Response): Promise<Re
     }));
     return res.json({
       success: true,
-      data: { locations: [...validLocations, ...invalidLocations] },
+      data: { locations: [...validLocations, ...repeatedLocations, ...invalidLocations] },
     });
   } catch (err) {
     // Error handling
