@@ -328,7 +328,8 @@ export const validateCode = async (req: IRequest, res: Response): Promise<Respon
     if (code?.code_type !== codeType) {
       return res.status(400).json({
         success: false,
-        message: 'Code type is invalid',
+        status: 'invalidType',
+        message: 'The code type is invalid',
       });
     }
 
